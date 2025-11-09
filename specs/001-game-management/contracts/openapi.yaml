@@ -1,0 +1,715 @@
+openapi: 3.0.3
+info:
+  title: Two Truths and a Lie Game Management API
+  description: REST API for managing game sessions, teams, episodes, voting, and scoring
+  version: 1.0.0
+  contact:
+    name: Game Management Team
+
+servers:
+  - url: http://localhost:3000/api
+    description: Local development
+  - url: https://usohonto.example.com/api
+    description: Production
+
+paths:
+  /sessions:
+    post:
+      summary: Create new game session
+      description: Creates a new game session and returns a unique 6-character session ID
+      operationId: createSession
+      tags:
+        - Sessions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - hostNickname
+              properties:
+                hostNickname:
+                  type: string
+                  minLength: 1
+                  maxLength: 30
+                  example: "Keisuke"
+                scoringRules:
+                  $ref: '#/components/schemas/ScoringRules'
+      responses:
+        '201':
+          description: Session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /sessions/{sessionId}:
+    get:
+      summary: Get session details
+      description: Retrieve current game session state including teams, scores, and phase
+      operationId: getSession
+      tags:
+        - Sessions
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Session details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameStateResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /sessions/{sessionId}/join:
+    post:
+      summary: Join game session
+      description: Add a participant to an existing game session
+      operationId: joinSession
+      tags:
+        - Sessions
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nickname
+              properties:
+                nickname:
+                  type: string
+                  minLength: 1
+                  maxLength: 30
+                  example: "Taro"
+      responses:
+        '200':
+          description: Successfully joined session
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  participantId:
+                    type: string
+                    format: uuid
+                  sessionId:
+                    type: string
+                    example: "3KH9Q2"
+                  nickname:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /sessions/{sessionId}/teams:
+    put:
+      summary: Update team assignments
+      description: Create teams and assign participants (host only)
+      operationId: updateTeams
+      tags:
+        - Teams
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - teams
+              properties:
+                teams:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - name
+                      - participantIds
+                    properties:
+                      name:
+                        type: string
+                        example: "Team A"
+                      participantIds:
+                        type: array
+                        items:
+                          type: string
+                          format: uuid
+      responses:
+        '200':
+          description: Teams updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  teams:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Team'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /sessions/{sessionId}/start:
+    post:
+      summary: Start game
+      description: Transition from preparation to first turn (host only)
+      operationId: startGame
+      tags:
+        - Sessions
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - presentationOrder
+              properties:
+                presentationOrder:
+                  type: array
+                  description: Array of team IDs in presentation order
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        '200':
+          description: Game started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameStateResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /sessions/{sessionId}/end:
+    post:
+      summary: End game
+      description: Complete game and transition to final results (host only)
+      operationId: endGame
+      tags:
+        - Sessions
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Game ended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameStateResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /sessions/{sessionId}/events:
+    get:
+      summary: Subscribe to real-time updates
+      description: Server-Sent Events endpoint for real-time game state updates
+      operationId: subscribeToUpdates
+      tags:
+        - Real-time
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: SSE connection established
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: Stream of server-sent events
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /episodes:
+    post:
+      summary: Register episodes
+      description: Submit 3 episodes (2 truths, 1 lie) for a participant
+      operationId: registerEpisodes
+      tags:
+        - Episodes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterEpisodesRequest'
+      responses:
+        '201':
+          description: Episodes registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  participantId:
+                    type: string
+                    format: uuid
+                  episodes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Episode'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: Update episodes
+      description: Edit episodes before team's turn starts
+      operationId: updateEpisodes
+      tags:
+        - Episodes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterEpisodesRequest'
+      responses:
+        '200':
+          description: Episodes updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  participantId:
+                    type: string
+                    format: uuid
+                  episodes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Episode'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          description: Cannot edit episodes during or after team's turn
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /votes:
+    post:
+      summary: Submit vote
+      description: Team submits their guess about which episode is the lie
+      operationId: submitVote
+      tags:
+        - Voting
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitVoteRequest'
+      responses:
+        '201':
+          description: Vote submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  voteId:
+                    type: string
+                    format: uuid
+                  teamId:
+                    type: string
+                    format: uuid
+                  selectedEpisodeNumber:
+                    type: integer
+                    minimum: 1
+                    maximum: 3
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          description: Team already voted or presenting team cannot vote
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /turns/{turnId}/reveal:
+    post:
+      summary: Reveal answer
+      description: Show correct answer, calculate scores, and update scoreboard (host only)
+      operationId: revealAnswer
+      tags:
+        - Turns
+      parameters:
+        - name: turnId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Answer revealed and scores calculated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TurnRevealResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  parameters:
+    SessionId:
+      name: sessionId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: '^[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{6}$'
+        example: "3KH9Q2"
+
+  schemas:
+    ScoringRules:
+      type: object
+      properties:
+        pointsForCorrectGuess:
+          type: integer
+          default: 10
+          example: 10
+        pointsPerDeception:
+          type: integer
+          default: 5
+          example: 5
+
+    SessionResponse:
+      type: object
+      required:
+        - sessionId
+        - hostId
+        - phase
+      properties:
+        sessionId:
+          type: string
+          example: "3KH9Q2"
+        hostId:
+          type: string
+          format: uuid
+        phase:
+          $ref: '#/components/schemas/SessionPhase'
+        createdAt:
+          type: string
+          format: date-time
+
+    GameStateResponse:
+      type: object
+      required:
+        - sessionId
+        - phase
+        - teams
+        - participants
+      properties:
+        sessionId:
+          type: string
+        phase:
+          $ref: '#/components/schemas/SessionPhase'
+        teams:
+          type: array
+          items:
+            $ref: '#/components/schemas/Team'
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/Participant'
+        currentTurn:
+          $ref: '#/components/schemas/Turn'
+          nullable: true
+        scoringRules:
+          $ref: '#/components/schemas/ScoringRules'
+
+    Team:
+      type: object
+      required:
+        - id
+        - name
+        - cumulativeScore
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "Team A"
+        participantIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        cumulativeScore:
+          type: integer
+          minimum: 0
+          example: 25
+
+    Participant:
+      type: object
+      required:
+        - id
+        - nickname
+        - role
+      properties:
+        id:
+          type: string
+          format: uuid
+        nickname:
+          type: string
+          example: "Taro"
+        role:
+          type: string
+          enum: [host, player]
+        teamId:
+          type: string
+          format: uuid
+          nullable: true
+        connectionStatus:
+          type: string
+          enum: [connected, disconnected]
+        hasRegisteredEpisodes:
+          type: boolean
+
+    Episode:
+      type: object
+      required:
+        - id
+        - episodeNumber
+        - text
+      properties:
+        id:
+          type: string
+          format: uuid
+        episodeNumber:
+          type: integer
+          minimum: 1
+          maximum: 3
+        text:
+          type: string
+          minLength: 10
+          maxLength: 500
+          example: "I once climbed Mount Fuji"
+        # Note: isLie field never exposed to clients
+
+    Turn:
+      type: object
+      required:
+        - id
+        - turnNumber
+        - presentingTeamId
+        - phase
+      properties:
+        id:
+          type: string
+          format: uuid
+        turnNumber:
+          type: integer
+          example: 1
+        presentingTeamId:
+          type: string
+          format: uuid
+        presenterNickname:
+          type: string
+        phase:
+          type: string
+          enum: [presenting, voting, revealing]
+        presentedEpisodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Episode'
+        timerRemainingMs:
+          type: integer
+          nullable: true
+          description: Milliseconds remaining (null if timer not started)
+        votesReceived:
+          type: integer
+          description: Number of teams that have voted
+
+    TurnRevealResponse:
+      type: object
+      required:
+        - correctEpisodeNumber
+        - votes
+        - pointsAwarded
+        - updatedScores
+      properties:
+        correctEpisodeNumber:
+          type: integer
+          minimum: 1
+          maximum: 3
+        votes:
+          type: array
+          items:
+            type: object
+            properties:
+              teamId:
+                type: string
+                format: uuid
+              teamName:
+                type: string
+              selectedEpisodeNumber:
+                type: integer
+              isCorrect:
+                type: boolean
+        pointsAwarded:
+          type: object
+          properties:
+            presentingTeamPoints:
+              type: integer
+            correctGuessingTeams:
+              type: array
+              items:
+                type: object
+                properties:
+                  teamId:
+                    type: string
+                    format: uuid
+                  points:
+                    type: integer
+        updatedScores:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Map of teamId to new cumulative score
+
+    RegisterEpisodesRequest:
+      type: object
+      required:
+        - participantId
+        - episodes
+      properties:
+        participantId:
+          type: string
+          format: uuid
+        episodes:
+          type: array
+          minItems: 3
+          maxItems: 3
+          items:
+            type: object
+            required:
+              - episodeNumber
+              - text
+              - isLie
+            properties:
+              episodeNumber:
+                type: integer
+                minimum: 1
+                maximum: 3
+              text:
+                type: string
+                minLength: 10
+                maxLength: 500
+              isLie:
+                type: boolean
+
+    SubmitVoteRequest:
+      type: object
+      required:
+        - sessionId
+        - teamId
+        - selectedEpisodeNumber
+      properties:
+        sessionId:
+          type: string
+        teamId:
+          type: string
+          format: uuid
+        selectedEpisodeNumber:
+          type: integer
+          minimum: 1
+          maximum: 3
+
+    SessionPhase:
+      type: string
+      enum:
+        - preparation
+        - presentation
+        - voting
+        - reveal
+        - completed
+
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          description: Additional error context
+          additionalProperties: true
+
+  responses:
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Operation not allowed for this user
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  securitySchemes:
+    SessionAuth:
+      type: apiKey
+      in: header
+      name: X-Session-ID
+      description: Session ID for participant authentication
+
+security:
+  - SessionAuth: []
+
+tags:
+  - name: Sessions
+    description: Game session lifecycle management
+  - name: Teams
+    description: Team creation and participant assignment
+  - name: Episodes
+    description: Episode registration and updates
+  - name: Voting
+    description: Vote submission during game
+  - name: Turns
+    description: Turn progression and answer reveals
+  - name: Real-time
+    description: Server-Sent Events for live updates

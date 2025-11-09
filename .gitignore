@@ -38,3 +38,20 @@ yarn-error.log*
 next-env.d.ts
 
 # End of https://www.toptal.com/developers/gitignore/api/nextjs
+
+# Additional patterns for this project
+.env
+.env.local
+.env.*.local
+*.log
+.vscode/
+.idea/
+dist/
+*.tmp
+*.swp
+tests/coverage/
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
