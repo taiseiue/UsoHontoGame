@@ -1,0 +1,300 @@
+# Session Management Server Actions Contract
+#
+# This contract defines the Server Actions for session management.
+# Next.js Server Actions provide a way to handle form submissions and
+# mutations without creating explicit API routes.
+#
+# Server Actions are functions marked with 'use server' that can be
+# called from Client Components or Server Components.
+
+actions:
+  # Create Session Action
+  createSession:
+    description: |
+      Creates a new session with a unique session ID and stores it in cookies.
+      Called automatically when a user without a session visits the site.
+
+    input: null  # No parameters required
+
+    output:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          description: Unique session identifier (21-char nanoid)
+          example: "V1StGXR8_Z5jdHi6B-myT"
+        success:
+          type: boolean
+          description: Whether session was created successfully
+          example: true
+      required:
+        - sessionId
+        - success
+
+    sideEffects:
+      - Sets `sessionId` cookie (HttpOnly, Secure, SameSite=Lax, Max-Age=30 days)
+      - Creates session record in repository
+
+    errors:
+      - code: SESSION_CREATION_FAILED
+        message: Failed to create session
+        httpStatus: 500
+
+    functionalRequirements:
+      - FR-001: System MUST create a unique session ID for each new visitor
+      - FR-001: Session ID stored in secure, HTTP-only cookie
+      - FR-005: Cookie expiration time of at least 30 days
+
+    securityConsiderations:
+      - Session ID must be cryptographically secure (nanoid)
+      - HTTP-only flag prevents XSS access to session ID
+      - Secure flag ensures HTTPS transmission only (production)
+      - SameSite=Lax provides CSRF protection
+
+  # Set Nickname Action
+  setNickname:
+    description: |
+      Sets or updates the nickname for the current session.
+      Called when user submits the nickname form.
+
+    input:
+      type: object
+      properties:
+        nickname:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: User-chosen display name
+          example: "田中太郎"
+      required:
+        - nickname
+
+    output:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Whether nickname was set successfully
+          example: true
+        nickname:
+          type: string
+          description: The saved nickname (trimmed)
+          example: "田中太郎"
+      required:
+        - success
+        - nickname
+
+    sideEffects:
+      - Sets `nickname` cookie (Secure, SameSite=Lax, Max-Age=30 days)
+      - Updates session record with nickname
+
+    errors:
+      - code: EMPTY_NICKNAME
+        message: ニックネームを入力してください
+        httpStatus: 400
+        validationError: true
+
+      - code: NICKNAME_TOO_LONG
+        message: ニックネームは50文字以内で入力してください
+        httpStatus: 400
+        validationError: true
+
+      - code: NO_SESSION
+        message: セッションが見つかりません
+        httpStatus: 401
+        description: User must have a valid session before setting nickname
+
+      - code: NICKNAME_UPDATE_FAILED
+        message: ニックネームの設定に失敗しました
+        httpStatus: 500
+
+    functionalRequirements:
+      - FR-002: System MUST prompt users without nickname to set nickname
+      - FR-003: Store nickname in cookie alongside session ID
+      - FR-014: Validate that nicknames are not empty strings
+      - FR-015: Allow multiple users to have the same nickname
+
+    validationRules:
+      - Nickname must not be empty or only whitespace (FR-014)
+      - Nickname must not exceed 50 characters (assumption)
+      - Nickname is trimmed before storage
+      - Duplicate nicknames are allowed (FR-015)
+
+    securityConsiderations:
+      - Nickname cookie is NOT HttpOnly (client needs to read for display)
+      - Input sanitization to prevent XSS in nickname display
+      - Rate limiting recommended to prevent abuse
+
+  # Validate Session Action
+  validateSession:
+    description: |
+      Validates the current session from cookies.
+      Called on page load to check if user has a valid session.
+
+    input: null  # Reads from cookies automatically
+
+    output:
+      type: object
+      properties:
+        valid:
+          type: boolean
+          description: Whether session is valid
+          example: true
+        sessionId:
+          type: string
+          nullable: true
+          description: Session ID if valid, null otherwise
+          example: "V1StGXR8_Z5jdHi6B-myT"
+        nickname:
+          type: string
+          nullable: true
+          description: Nickname if set, null otherwise
+          example: "田中太郎"
+        hasNickname:
+          type: boolean
+          description: Whether user has set a nickname
+          example: true
+      required:
+        - valid
+        - hasNickname
+
+    sideEffects: []  # Read-only operation
+
+    errors:
+      - code: INVALID_SESSION
+        message: Invalid or expired session
+        httpStatus: 401
+        description: Session ID format invalid or not found
+
+    functionalRequirements:
+      - FR-004: Persist session ID and nickname cookies across browser sessions
+      - FR-005: Cookie expiration time of at least 30 days
+
+    behaviorNotes:
+      - If sessionId cookie missing → valid=false, trigger createSession
+      - If sessionId valid but nickname missing → valid=true, hasNickname=false
+      - If both present and valid → valid=true, hasNickname=true
+
+# Server Action Implementation Pattern
+implementationNotes:
+  location: src/app/actions/session.ts
+
+  pattern: |
+    // src/app/actions/session.ts
+    'use server';
+
+    import { cookies } from 'next/headers';
+    import { CreateSession } from '@/server/application/use-cases/session/CreateSession';
+    import { SetNickname } from '@/server/application/use-cases/session/SetNickname';
+
+    export async function createSessionAction() {
+      const useCase = new CreateSession(sessionRepository);
+      const session = await useCase.execute();
+
+      const cookieStore = cookies();
+      cookieStore.set('sessionId', session.sessionId, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+        path: '/',
+      });
+
+      return { sessionId: session.sessionId, success: true };
+    }
+
+  errorHandling: |
+    Server Actions should return error objects rather than throwing:
+
+    try {
+      // ... action logic
+      return { success: true, data };
+    } catch (error) {
+      if (error instanceof EmptyNicknameError) {
+        return {
+          success: false,
+          error: {
+            code: 'EMPTY_NICKNAME',
+            message: 'ニックネームを入力してください'
+          }
+        };
+      }
+      // ... other error cases
+    }
+
+  testing: |
+    Server Actions are tested as integration tests:
+    - Mock cookies() from next/headers
+    - Mock repository layer
+    - Verify cookie operations
+    - Verify use case execution
+
+    Example:
+    // tests/integration/actions/session.test.ts
+    import { createSessionAction } from '@/app/actions/session';
+
+    vi.mock('next/headers', () => ({
+      cookies: () => mockCookieStore,
+    }));
+
+    test('createSessionAction sets session cookie', async () => {
+      const result = await createSessionAction();
+      expect(result.success).toBe(true);
+      expect(mockCookieStore.set).toHaveBeenCalledWith(
+        'sessionId',
+        expect.stringMatching(/^[A-Za-z0-9_-]{21}$/),
+        expect.objectContaining({ httpOnly: true })
+      );
+    });
+
+# Cookie Specifications
+cookieContract:
+  sessionId:
+    name: sessionId
+    value: 21-character nanoid string
+    flags:
+      httpOnly: true
+      secure: true  # production only
+      sameSite: lax
+      path: /
+      maxAge: 2592000  # 30 days in seconds
+    purpose: Store unique session identifier securely
+    accessibleBy: Server only (HTTP-only)
+
+  nickname:
+    name: nickname
+    value: 1-50 character string (trimmed)
+    flags:
+      httpOnly: false  # Client needs to read
+      secure: true  # production only
+      sameSite: lax
+      path: /
+      maxAge: 2592000  # 30 days in seconds
+    purpose: Store user's display name
+    accessibleBy: Server and client (JavaScript)
+    notes: |
+      Not HttpOnly because client components need to read nickname
+      for display purposes. Still secure with HTTPS in production.
+
+# Related Specifications
+relatedDocuments:
+  - spec.md (User Story 1: First-Time Visitor Creates Session)
+  - data-model.md (Session Entity, SessionId VO, Nickname VO)
+  - research.md (Decision: Cookie-Based Session Management)
+  - FR-001, FR-002, FR-003, FR-004, FR-005, FR-014, FR-015
+
+# Success Criteria Mapping
+successCriteria:
+  SC-001:
+    description: New users can establish session and set nickname in under 30 seconds
+    measuredBy:
+      - Time from page load to createSessionAction completion < 1 second
+      - Time from nickname form display to setNicknameAction completion < 2 seconds
+      - Total user interaction time < 30 seconds
+
+  SC-002:
+    description: Session cookies persist for at least 30 days
+    measuredBy:
+      - Cookie maxAge set to 2592000 seconds (30 days)
+      - Cookies remain valid across browser restarts
+      - validateSessionAction returns valid=true within 30 days

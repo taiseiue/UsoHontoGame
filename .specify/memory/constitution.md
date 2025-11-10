@@ -20,12 +20,13 @@ Templates Requiring Updates:
 ✅ plan-template.md - Aligned with Clean Architecture and constitution check
 ✅ tasks-template.md - Aligned with TDD requirement and component structure
 
-Follow-up TODOs: None
--->
-
 # UsoHontoGame (Two Truths and a Lie) Project Constitution
 
 ## Core Principles
+
+### 0. Git commit (NON-NEGOTIATABLE)
+
+When you complete each task, you must add all files and commit with suitable commit message.
 
 ### I. Clean Architecture (NON-NEGOTIABLE)
 

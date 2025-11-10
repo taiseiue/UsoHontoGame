@@ -1,0 +1,340 @@
+# TOP Page Component Interface Contract
+#
+# This contract defines the interface for the TOP page,
+# including component props, data fetching, and rendering behavior.
+#
+# The TOP page is a Server Component that fetches game data server-side
+# and conditionally renders either nickname input or game list.
+
+component:
+  name: TopPage
+  location: src/app/page.tsx
+  type: Server Component
+  description: |
+    Main landing page (/) that displays available games or prompts for nickname.
+    Implements User Story 1 (session creation) and User Story 2 (browse games).
+
+routing:
+  path: /
+  method: GET
+  description: Default route, accessible at application root
+
+serverSideDataFetching:
+  description: |
+    Server Component fetches data during server-side rendering.
+    Ensures content is available without JavaScript (FR-016).
+
+  operations:
+    - name: validateSession
+      description: Check if user has valid session with nickname
+      implementation: |
+        import { cookies } from 'next/headers';
+        const cookieStore = cookies();
+        const sessionId = cookieStore.get('sessionId')?.value;
+        const nickname = cookieStore.get('nickname')?.value;
+
+    - name: getAvailableGames
+      description: Fetch games with status '出題中' (FR-007)
+      implementation: |
+        import { GetAvailableGames } from '@/server/application/use-cases/games/GetAvailableGames';
+        const useCase = new GetAvailableGames(gameRepository);
+        const games = await useCase.execute();
+      returns: GameDto[]
+      filters: status === '出題中' (FR-007, FR-008)
+
+conditionalRendering:
+  description: TOP page renders different content based on session state
+
+  case1_noNickname:
+    condition: Session valid but nickname not set
+    renders: NicknameInput component (Client Component)
+    functionalRequirements:
+      - FR-002: Prompt users without nickname to set nickname
+    userStory: User Story 1 - First-Time Visitor Creates Session
+
+  case2_hasNickname:
+    condition: Session valid and nickname set
+    renders: GameList component with navigation links
+    functionalRequirements:
+      - FR-007: Display games with status '出題中'
+      - FR-012: Include navigation link to dashboard
+      - FR-013: Include navigation link to game management
+    userStory: User Story 2 - Browse Available Games
+
+# Component Hierarchy
+componentTree:
+  TopPage (Server Component):
+    description: Root page component at /
+    props: null  # Page components don't receive props
+    children:
+      - NicknameInput (Client Component):
+          condition: !nickname
+          props:
+            initialNickname:
+              type: string
+              optional: true
+              description: Pre-filled nickname if available
+              default: ""
+          functionalRequirements:
+            - FR-002: Prompt for nickname
+            - FR-014: Validate non-empty nickname
+          events:
+            onSubmit:
+              description: Calls setNicknameAction Server Action
+              payload: { nickname: string }
+
+      - GameListSection (Server Component):
+          condition: nickname
+          props: null
+          children:
+            - Navigation (Server Component):
+                props: null
+                description: Dashboard and game management links
+                functionalRequirements:
+                  - FR-012: Link to dashboard
+                  - FR-013: Link to game management
+                children:
+                  - Link (Next.js):
+                      to: /dashboard
+                      label: "ダッシュボード"
+                  - Link (Next.js):
+                      to: /games
+                      label: "ゲーム管理"
+
+            - GameList (Server Component):
+                props:
+                  games:
+                    type: GameDto[]
+                    description: Array of available games (status='出題中')
+                    required: true
+                functionalRequirements:
+                  - FR-007: Display only games with status '出題中'
+                  - FR-008: NOT display '準備中' or '締切' games
+                  - FR-011: Show message when no games available
+                children:
+                  - GameCard (Server Component):
+                      props:
+                        game:
+                          type: GameDto
+                          required: true
+                      displays:
+                        - FR-009: Game name
+                        - FR-010: Available player slots
+
+# Data Structures
+dataTypes:
+  GameDto:
+    description: Game summary for display on TOP page
+    source: server/application/dto/GameDto.ts
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: Unique game identifier
+        example: "123e4567-e89b-12d3-a456-426614174000"
+      name:
+        type: string
+        description: Game display name
+        example: "チームAのゲーム"
+      availableSlots:
+        type: number
+        minimum: 0
+        description: Number of open player slots (maxPlayers - currentPlayers)
+        example: 5
+
+  SessionValidation:
+    description: Session validation result
+    properties:
+      valid:
+        type: boolean
+        description: Whether session is valid
+      hasNickname:
+        type: boolean
+        description: Whether nickname is set
+      nickname:
+        type: string
+        nullable: true
+        description: User's nickname if set
+
+# Rendering Behavior
+rendering:
+  strategy: Server-Side Rendering (SSR)
+  frequency: On every page load (not cached for MVP)
+  noJavaScriptSupport: true  # FR-016
+  description: |
+    TOP page must be fully functional without JavaScript:
+    - Game list is rendered server-side
+    - Navigation links work with standard HTML <a> tags
+    - Only nickname input form requires JavaScript for validation
+
+  javascriptEnhancement:
+    nicknameValidation:
+      description: Client-side validation provides immediate feedback
+      fallback: Server-side validation in setNicknameAction
+      progressive: Works without JS, enhanced with JS
+
+# User Interactions
+interactions:
+  nicknameSubmission:
+    trigger: User submits nickname form
+    action: setNicknameAction Server Action
+    validations:
+      client: useNicknameForm hook (immediate feedback)
+      server: SetNickname use case (security)
+    successBehavior: Page refresh showing game list
+    errorBehavior: Display validation error message
+
+  navigationClick:
+    trigger: User clicks dashboard or game management link
+    action: Next.js client-side navigation (with JS) or full page load (without JS)
+    destination: /dashboard or /games
+    requirements:
+      - FR-012: Dashboard link present
+      - FR-013: Game management link present
+
+# Loading States
+loadingStates:
+  initialLoad:
+    description: Server renders complete HTML
+    displayTime: 0ms (immediate)
+    fallback: null  # No loading spinner needed (SSR)
+
+  formSubmission:
+    description: User submits nickname form
+    displayTime: ~100-500ms (server action round-trip)
+    fallback: Disabled button with "設定中..." text
+
+# Error States
+errorStates:
+  noGamesAvailable:
+    condition: getAvailableGames returns empty array
+    display: |
+      <EmptyState>
+        現在参加可能なゲームはありません
+      </EmptyState>
+    functionalRequirement: FR-011
+
+  sessionError:
+    condition: Session validation fails
+    behavior: Auto-create new session with createSessionAction
+    userExperience: Transparent (user doesn't see error)
+
+  nicknameValidationError:
+    condition: Empty or too long nickname
+    display: Error message below input field
+    messages:
+      empty: "ニックネームを入力してください"
+      tooLong: "ニックネームは50文字以内で入力してください"
+    functionalRequirement: FR-014
+
+# Accessibility
+accessibility:
+  semanticHTML: true
+  keyboardNavigation: true
+  screenReaderSupport: true
+  ariaLabels:
+    nicknameInput: "ニックネーム"
+    gameList: "参加可能なゲーム一覧"
+    navigationLinks: "ナビゲーション"
+
+# Performance Targets
+performance:
+  pageLoad:
+    target: <2 seconds (SC-003)
+    measurement: Time to First Contentful Paint (FCP)
+    includes:
+      - Server-side session validation
+      - Database query for games (or in-memory lookup)
+      - HTML rendering and transmission
+
+  nicknameSetup:
+    target: <30 seconds total (SC-001)
+    breakdown:
+      - Page load: <2 seconds
+      - User input: variable
+      - Form submission: <1 second
+      - Page refresh: <2 seconds
+
+# Testing Scenarios
+testingScenarios:
+  unit:
+    - Session validation logic
+    - Game filtering logic
+    - Nickname validation in hook
+
+  integration:
+    - TOP page renders nickname input when no nickname
+    - TOP page renders game list when nickname set
+    - Game list filters by status='出題中'
+    - Empty state shows when no games available
+
+  e2e:
+    acceptanceTest1:
+      scenario: User Story 1 - First-Time Visitor Creates Session
+      given: New visitor without session
+      when: Access TOP page at /
+      then:
+        - Session ID assigned and stored in cookie
+        - Nickname input form displayed
+        - User can enter nickname and submit
+        - Nickname stored in cookie
+        - Page refreshes showing game list or empty state
+
+    acceptanceTest2:
+      scenario: User Story 2 - Browse Available Games
+      given: User with valid session and nickname
+      when: Access TOP page at /
+      then:
+        - Game list displays all games with status='出題中'
+        - Each game shows name and available slots
+        - Games with status '準備中' or '締切' not displayed
+        - If no '出題中' games, empty state message shown
+
+    acceptanceTest3:
+      scenario: User Story 3 - Navigate to Dashboard
+      given: User on TOP page with nickname set
+      when: Click dashboard link
+      then:
+        - Navigate to /dashboard
+        - Link is clearly labeled
+
+    acceptanceTest4:
+      scenario: User Story 4 - Navigate to Game Management
+      given: User on TOP page with nickname set
+      when: Click game management link
+      then:
+        - Navigate to /games
+        - Link is clearly labeled
+
+# Related Specifications
+relatedDocuments:
+  - spec.md (User Stories 1-4, FR-002, FR-007-013, FR-016)
+  - data-model.md (GameDto, SessionDto)
+  - session-actions.yaml (Server Actions used by this page)
+  - research.md (Decision: Server Component vs Client Component Strategy)
+
+# Implementation Notes
+implementationNotes:
+  suspenseBoundaries:
+    description: |
+      Consider wrapping async operations in Suspense boundaries
+      if loading times exceed targets.
+    example: |
+      <Suspense fallback={<GameListSkeleton />}>
+        <GameList games={games} />
+      </Suspense>
+
+  revalidation:
+    description: |
+      MVP uses on-demand revalidation (refresh to see new games).
+      Future: Consider revalidatePath() when games change status.
+
+  styling:
+    description: |
+      Use Tailwind CSS v4 utility classes.
+      Follow responsive design principles (mobile-first).
+    example: |
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">参加可能なゲーム</h1>
+        <GameList games={games} />
+      </div>
