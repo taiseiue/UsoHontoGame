@@ -154,14 +154,14 @@ This document provides a complete, dependency-ordered task list for implementing
 ### Presentation Layer
 
 - [X] T049 [US2] Create presenter action Server Actions (addPresenter, removePresenter with Zod validation and NotFoundError handling) in `src/app/actions/presenter.ts`
-- [ ] T050 [US2] Create usePresenterForm hook with Zod in `src/hooks/usePresenterForm.ts`
-- [ ] T051 [US2] Create useEpisodeForm hook with Zod in `src/hooks/useEpisodeForm.ts`
-- [ ] T052 [US2] Create PresenterList component in `src/components/domain/game/PresenterList.tsx`
-- [ ] T053 [US2] Create PresenterForm component in `src/components/domain/game/PresenterForm.tsx`
-- [ ] T054 [US2] Create EpisodeList component with lie marker (confidential) in `src/components/domain/game/EpisodeList.tsx`
-- [ ] T055 [US2] Create EpisodeForm component in `src/components/domain/game/EpisodeForm.tsx`
-- [ ] T056 [US2] Create presenter management page in `src/app/games/[id]/presenters/page.tsx`
-- [ ] T057 [US2] Write E2E test for presenter registration flow in `tests/e2e/presenter-management.spec.ts`
+- [X] T050 [US2] Create usePresenterForm hook with Zod in `src/hooks/usePresenterForm.ts`
+- [X] T051 [US2] Create useEpisodeForm hook with Zod in `src/hooks/useEpisodeForm.ts`
+- [X] T052 [US2] Create PresenterList component in `src/components/domain/game/PresenterList.tsx`
+- [X] T053 [US2] Create PresenterForm component in `src/components/domain/game/PresenterForm.tsx`
+- [X] T054 [US2] Create EpisodeList component with lie marker (confidential) in `src/components/domain/game/EpisodeList.tsx`
+- [X] T055 [US2] Create EpisodeForm component in `src/components/domain/game/EpisodeForm.tsx`
+- [X] T056 [US2] Create presenter management page in `src/app/games/[id]/presenters/page.tsx`
+- [X] T057 [US2] Write E2E test for presenter registration flow in `tests/e2e/presenter-management.spec.ts`
 
 **US2 Completion Criteria**:
 - ✅ Presenter added to game with nickname

@@ -7,6 +7,8 @@ import type { IGameRepository } from "@/server/domain/repositories/IGameReposito
 import { Game } from "@/server/domain/entities/Game";
 import { GameId } from "@/server/domain/value-objects/GameId";
 import { GameStatus } from "@/server/domain/value-objects/GameStatus";
+import type { Presenter } from "@/server/domain/entities/Presenter";
+import type { Episode } from "@/server/domain/entities/Episode";
 
 /**
  * PrismaGameRepository
@@ -28,7 +30,15 @@ export class PrismaGameRepository implements IGameRepository {
 			orderBy: { createdAt: "desc" },
 		});
 
-		return games.map((game) => this.toDomain(game));
+		return games.map((game: {
+			id: string;
+			name: string;
+			status: string;
+			maxPlayers: number;
+			currentPlayers: number;
+			createdAt: Date;
+			updatedAt: Date;
+		}) => this.toDomain(game));
 	}
 
 	/**
@@ -41,7 +51,15 @@ export class PrismaGameRepository implements IGameRepository {
 			orderBy: { createdAt: "desc" },
 		});
 
-		return games.map((game) => this.toDomain(game));
+		return games.map((game: {
+			id: string;
+			name: string;
+			status: string;
+			maxPlayers: number;
+			currentPlayers: number;
+			createdAt: Date;
+			updatedAt: Date;
+		}) => this.toDomain(game));
 	}
 
 	/**
@@ -99,6 +117,78 @@ export class PrismaGameRepository implements IGameRepository {
 		await this.prisma.game.delete({
 			where: { id: id.value },
 		});
+	}
+
+	// Presenter operations
+
+	/**
+	 * Find all presenters for a game
+	 * @param gameId Game ID to find presenters for
+	 */
+	async findPresentersByGameId(gameId: string): Promise<Presenter[]> {
+		// TODO: Implement presenter operations with Prisma
+		// For now, return empty array (will be implemented in future)
+		return [];
+	}
+
+	/**
+	 * Find a single presenter by ID
+	 * @param presenterId Presenter ID to search for
+	 */
+	async findPresenterById(presenterId: string): Promise<Presenter | null> {
+		// TODO: Implement presenter operations with Prisma
+		return null;
+	}
+
+	/**
+	 * Add a presenter to a game
+	 * @param presenter Presenter entity to create
+	 */
+	async addPresenter(presenter: Presenter): Promise<void> {
+		// TODO: Implement presenter operations with Prisma
+	}
+
+	/**
+	 * Remove a presenter from a game (cascade deletes episodes)
+	 * @param presenterId Presenter ID to delete
+	 */
+	async removePresenter(presenterId: string): Promise<void> {
+		// TODO: Implement presenter operations with Prisma
+	}
+
+	// Episode operations
+
+	/**
+	 * Find all episodes for a presenter
+	 * @param presenterId Presenter ID to find episodes for
+	 */
+	async findEpisodesByPresenterId(presenterId: string): Promise<Episode[]> {
+		// TODO: Implement episode operations with Prisma
+		return [];
+	}
+
+	/**
+	 * Add an episode to a presenter
+	 * @param episode Episode entity to create
+	 */
+	async addEpisode(episode: Episode): Promise<void> {
+		// TODO: Implement episode operations with Prisma
+	}
+
+	/**
+	 * Remove an episode
+	 * @param episodeId Episode ID to delete
+	 */
+	async removeEpisode(episodeId: string): Promise<void> {
+		// TODO: Implement episode operations with Prisma
+	}
+
+	/**
+	 * Update an episode
+	 * @param episode Episode entity with updated data
+	 */
+	async updateEpisode(episode: Episode): Promise<void> {
+		// TODO: Implement episode operations with Prisma
 	}
 
 	/**

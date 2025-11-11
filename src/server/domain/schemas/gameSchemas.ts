@@ -10,10 +10,8 @@ export const GameIdSchema = z.string().uuid({
 });
 
 export const GameStatusSchema = z.enum(["準備中", "出題中", "締切"], {
-	errorMap: () => ({
-		message:
-			'ステータスは「準備中」「出題中」「締切」のいずれかでなければなりません',
-	}),
+	message:
+		'ステータスは「準備中」「出題中」「締切」のいずれかでなければなりません',
 });
 
 // Input Schemas (Server Actions & Forms)

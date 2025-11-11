@@ -13,6 +13,16 @@ describe('GetAvailableGames', () => {
     create: vi.fn(),
     update: vi.fn(),
     delete: vi.fn(),
+    // Presenter operations
+    findPresentersByGameId: vi.fn(),
+    findPresenterById: vi.fn(),
+    addPresenter: vi.fn(),
+    removePresenter: vi.fn(),
+    // Episode operations
+    findEpisodesByPresenterId: vi.fn(),
+    addEpisode: vi.fn(),
+    removeEpisode: vi.fn(),
+    updateEpisode: vi.fn(),
   });
 
   const createGame = (
