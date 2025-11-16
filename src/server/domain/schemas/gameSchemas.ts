@@ -51,12 +51,12 @@ export const AddPresenterSchema = z.object({
 
 export const RemovePresenterSchema = z.object({
   gameId: GameIdSchema,
-  presenterId: z.string().uuid(),
+  presenterId: z.string().min(1, { message: 'プレゼンターIDが必要です' }),
 });
 
 // Episode Schemas - CRITICAL: 1-1000 characters required (not an assumption)
 export const AddEpisodeSchema = z.object({
-  presenterId: z.string().uuid(),
+  presenterId: z.string().min(1, { message: 'プレゼンターIDが必要です' }),
   text: z.string().min(1, { message: 'エピソードは1文字以上でなければなりません' }).max(1000, {
     message: 'エピソードは1000文字以下でなければなりません',
   }),
@@ -65,7 +65,7 @@ export const AddEpisodeSchema = z.object({
 
 export const UpdateEpisodeSchema = z
   .object({
-    episodeId: z.string().uuid(),
+    episodeId: z.string().min(1, { message: 'エピソードIDが必要です' }),
     text: z.string().min(1).max(1000).optional(),
     isLie: z.boolean().optional(),
   })
@@ -74,7 +74,7 @@ export const UpdateEpisodeSchema = z
   });
 
 export const RemoveEpisodeSchema = z.object({
-  episodeId: z.string().uuid(),
+  episodeId: z.string().min(1, { message: 'エピソードIDが必要です' }),
 });
 
 // Inline Episode Registration Schema (Feature: 003-presenter-episode-inline)
