@@ -158,17 +158,19 @@ export function PresenterWithEpisodesForm({ gameId, onSuccess }: PresenterWithEp
               <div className="flex items-center">
                 <input
                   id={`is-lie-${index}`}
-                  type="checkbox"
+                  type="radio"
+                  name="lie-episode"
+                  value={index}
                   checked={episode.isLie}
                   onChange={(e) => updateEpisodeIsLie(index as 0 | 1 | 2, e.target.checked)}
-                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
+                  className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer"
                   disabled={isSubmitting}
                 />
                 <label
                   htmlFor={`is-lie-${index}`}
                   className="ml-2 text-sm text-gray-700 cursor-pointer"
                 >
-                  このエピソードはウソ（1つだけ選択）
+                  このエピソードをウソにする
                 </label>
               </div>
             </div>

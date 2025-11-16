@@ -98,7 +98,8 @@ export function usePresenterWithEpisodesForm(gameId: string) {
   }, []);
 
   /**
-   * Update lie marker for episode
+   * Update lie marker for episode with exclusive selection
+   * When an episode is marked as lie, all other episodes are automatically set to false
    */
   const updateEpisodeIsLie = useCallback((index: 0 | 1 | 2, isLie: boolean) => {
     setFormState((prev) => {
@@ -107,10 +108,23 @@ export function usePresenterWithEpisodesForm(gameId: string) {
         EpisodeFormValue,
         EpisodeFormValue,
       ];
-      newEpisodes[index] = {
-        ...newEpisodes[index],
-        isLie,
-      };
+      
+      if (isLie) {
+        // If marking this episode as lie, set all others to false (exclusive selection)
+        newEpisodes.forEach((episode, i) => {
+          newEpisodes[i] = {
+            ...episode,
+            isLie: i === index,
+          };
+        });
+      } else {
+        // If unmarking this episode as lie, just set this one to false
+        newEpisodes[index] = {
+          ...newEpisodes[index],
+          isLie: false,
+        };
+      }
+      
       return {
         ...prev,
         episodes: newEpisodes,
