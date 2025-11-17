@@ -5,8 +5,7 @@
 import { redirect } from 'next/navigation';
 import { getGamesAction } from '@/app/actions/game';
 import { GameListPage, GameListPageError } from '@/components/pages/GameListPage';
-import { COOKIE_NAMES } from '@/lib/constants';
-import { getCookie } from '@/lib/cookies';
+import { SessionServiceContainer } from '@/server/infrastructure/di/SessionServiceContainer';
 
 /**
  * Next.js App Router page for /games
@@ -14,7 +13,8 @@ import { getCookie } from '@/lib/cookies';
  */
 export default async function Page() {
   // Check session
-  const sessionId = await getCookie(COOKIE_NAMES.SESSION_ID);
+  const sessionService = SessionServiceContainer.getSessionService();
+  const sessionId = await sessionService.getCurrentSessionId();
   if (!sessionId) {
     redirect('/');
   }

@@ -3,12 +3,11 @@
 // Server Actions for session management
 // Provides server-side functions for session operations
 
-import { COOKIE_NAMES } from '@/lib/constants';
-import { getCookie } from '@/lib/cookies';
 import { CreateSession } from '@/server/application/use-cases/session/CreateSession';
 import { SetNickname } from '@/server/application/use-cases/session/SetNickname';
 import { ValidateSession } from '@/server/application/use-cases/session/ValidateSession';
 import { EmptyNicknameError, NicknameTooLongError } from '@/server/domain/value-objects/Nickname';
+import { SessionServiceContainer } from '@/server/infrastructure/di/SessionServiceContainer';
 import { CookieSessionRepository } from '@/server/infrastructure/repositories/CookieSessionRepository';
 
 // Create singleton repository instance
@@ -128,8 +127,9 @@ export async function setNicknameAction(nickname: string): Promise<SetNicknameRe
  */
 export async function validateSessionAction(): Promise<ValidateSessionResult> {
   try {
-    // Get session ID from cookie
-    const sessionId = await getCookie(COOKIE_NAMES.SESSION_ID);
+    // Get session service
+    const sessionService = SessionServiceContainer.getSessionService();
+    const sessionId = await sessionService.getCurrentSessionId();
 
     if (!sessionId) {
       return {

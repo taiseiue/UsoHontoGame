@@ -5,8 +5,6 @@
 // Server Actions with Zod validation for game management
 
 import { redirect } from 'next/navigation';
-import { COOKIE_NAMES } from '@/lib/constants';
-import { getCookie } from '@/lib/cookies';
 import type { GameDetailDto } from '@/server/application/dto/GameDetailDto';
 import type { CreateGameOutput, GameManagementDto } from '@/server/application/dto/GameDto';
 import { CloseGame } from '@/server/application/use-cases/games/CloseGame';
@@ -22,7 +20,27 @@ import {
   UpdateGameSchema,
 } from '@/server/domain/schemas/gameSchemas';
 import { GameId } from '@/server/domain/value-objects/GameId';
+import { SessionServiceContainer } from '@/server/infrastructure/di/SessionServiceContainer';
 import { createGameRepository } from '@/server/infrastructure/repositories';
+
+/**
+ * Helper function to get session ID with consistent error handling
+ */
+async function getSessionIdOrError(): Promise<
+  string | { success: false; errors: Record<string, string[]> }
+> {
+  try {
+    const sessionService = SessionServiceContainer.getSessionService();
+    return await sessionService.requireCurrentSession();
+  } catch {
+    return {
+      success: false,
+      errors: {
+        _form: ['セッションが見つかりません。ニックネームを設定してください。'],
+      },
+    };
+  }
+}
 
 /**
  * Server Action: Create new game
@@ -53,17 +71,12 @@ export async function createGameAction(
       };
     }
 
-    // Get session ID from cookies (moderator/creator ID)
-    const sessionId = await getCookie(COOKIE_NAMES.SESSION_ID);
-
-    if (!sessionId) {
-      return {
-        success: false,
-        errors: {
-          _form: ['セッションが見つかりません。ニックネームを設定してください。'],
-        },
-      };
+    // Get session ID (moderator/creator ID)
+    const sessionIdResult = await getSessionIdOrError();
+    if (typeof sessionIdResult === 'object' && !sessionIdResult.success) {
+      return sessionIdResult;
     }
+    const sessionId = sessionIdResult as string;
 
     // Execute CreateGame use case
     const repository = createGameRepository();
@@ -133,9 +146,8 @@ export async function startAcceptingAction(
     }
 
     // Get session ID (for authorization)
-    const sessionId = await getCookie(COOKIE_NAMES.SESSION_ID);
-
-    if (!sessionId) {
+    const sessionIdResult = await getSessionIdOrError();
+    if (typeof sessionIdResult === 'object' && !sessionIdResult.success) {
       return {
         success: false,
         errors: {
@@ -143,6 +155,7 @@ export async function startAcceptingAction(
         },
       };
     }
+    const _sessionId = sessionIdResult as string;
 
     // Execute use case
     const repository = createGameRepository();
@@ -189,9 +202,8 @@ export async function closeGameAction(
     }
 
     // Get session ID (for authorization)
-    const sessionId = await getCookie(COOKIE_NAMES.SESSION_ID);
-
-    if (!sessionId) {
+    const sessionIdResult = await getSessionIdOrError();
+    if (typeof sessionIdResult === 'object' && !sessionIdResult.success) {
       return {
         success: false,
         errors: {
@@ -199,6 +211,7 @@ export async function closeGameAction(
         },
       };
     }
+    const _sessionId = sessionIdResult as string;
 
     // Execute use case
     const repository = createGameRepository();
@@ -230,9 +243,8 @@ export async function getGamesAction(): Promise<
 > {
   try {
     // Get session ID (creator ID)
-    const sessionId = await getCookie(COOKIE_NAMES.SESSION_ID);
-
-    if (!sessionId) {
+    const sessionIdResult = await getSessionIdOrError();
+    if (typeof sessionIdResult === 'object' && !sessionIdResult.success) {
       return {
         success: false,
         errors: {
@@ -240,6 +252,7 @@ export async function getGamesAction(): Promise<
         },
       };
     }
+    const sessionId = sessionIdResult as string;
 
     // Execute use case
     const repository = createGameRepository();
@@ -277,9 +290,8 @@ export async function getGameDetailAction(
 > {
   try {
     // Get session ID (for authorization)
-    const sessionId = await getCookie(COOKIE_NAMES.SESSION_ID);
-
-    if (!sessionId) {
+    const sessionIdResult = await getSessionIdOrError();
+    if (typeof sessionIdResult === 'object' && !sessionIdResult.success) {
       return {
         success: false,
         errors: {
@@ -287,6 +299,7 @@ export async function getGameDetailAction(
         },
       };
     }
+    const sessionId = sessionIdResult as string;
 
     // Get game from repository
     const repository = createGameRepository();
@@ -368,9 +381,8 @@ export async function updateGameAction(
     }
 
     // Get session ID (for authorization)
-    const sessionId = await getCookie(COOKIE_NAMES.SESSION_ID);
-
-    if (!sessionId) {
+    const sessionIdResult = await getSessionIdOrError();
+    if (typeof sessionIdResult === 'object' && !sessionIdResult.success) {
       return {
         success: false,
         errors: {
@@ -378,6 +390,7 @@ export async function updateGameAction(
         },
       };
     }
+    const sessionId = sessionIdResult as string;
 
     // Execute UpdateGameSettings use case
     const repository = createGameRepository();
@@ -438,9 +451,8 @@ export async function deleteGameAction(
     }
 
     // Get session ID (for authorization)
-    const sessionId = await getCookie(COOKIE_NAMES.SESSION_ID);
-
-    if (!sessionId) {
+    const sessionIdResult = await getSessionIdOrError();
+    if (typeof sessionIdResult === 'object' && !sessionIdResult.success) {
       return {
         success: false,
         errors: {
@@ -448,6 +460,7 @@ export async function deleteGameAction(
         },
       };
     }
+    const sessionId = sessionIdResult as string;
 
     // Execute DeleteGame use case
     const repository = createGameRepository();

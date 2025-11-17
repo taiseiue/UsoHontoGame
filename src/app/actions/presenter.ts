@@ -5,8 +5,6 @@
 // Server Actions for managing presenters and episodes
 
 import { revalidatePath } from 'next/cache';
-import { COOKIE_NAMES } from '@/lib/constants';
-import { getCookie } from '@/lib/cookies';
 import type { EpisodeWithLieDto } from '@/server/application/dto/EpisodeWithLieDto';
 import type { PresenterWithLieDto } from '@/server/application/dto/PresenterWithLieDto';
 import { AddEpisode } from '@/server/application/use-cases/games/AddEpisode';
@@ -21,7 +19,27 @@ import {
   AddPresenterWithEpisodesSchema,
   RemovePresenterSchema,
 } from '@/server/domain/schemas/gameSchemas';
+import { SessionServiceContainer } from '@/server/infrastructure/di/SessionServiceContainer';
 import { createGameRepository } from '@/server/infrastructure/repositories';
+
+/**
+ * Helper function to get session ID with consistent error handling
+ */
+async function getSessionIdOrError(): Promise<
+  string | { success: false; errors: Record<string, string[]> }
+> {
+  try {
+    const sessionService = SessionServiceContainer.getSessionService();
+    return await sessionService.requireCurrentSession();
+  } catch {
+    return {
+      success: false,
+      errors: {
+        _form: ['セッションが見つかりません。ログインし直してください。'],
+      },
+    };
+  }
+}
 
 /**
  * Add Presenter Server Action
@@ -50,16 +68,11 @@ export async function addPresenterAction(
     }
 
     // Get session (for future authorization)
-    const sessionId = await getCookie(COOKIE_NAMES.SESSION_ID);
-
-    if (!sessionId) {
-      return {
-        success: false,
-        errors: {
-          _form: ['セッションが見つかりません。ログインし直してください。'],
-        },
-      };
+    const sessionIdResult = await getSessionIdOrError();
+    if (typeof sessionIdResult === 'object' && !sessionIdResult.success) {
+      return sessionIdResult;
     }
+    const _sessionId = sessionIdResult as string;
 
     // Execute use case
     const repository = createGameRepository();
@@ -112,9 +125,8 @@ export async function removePresenterAction(
     }
 
     // Get session (for future authorization)
-    const sessionId = await getCookie(COOKIE_NAMES.SESSION_ID);
-
-    if (!sessionId) {
+    const sessionIdResult = await getSessionIdOrError();
+    if (typeof sessionIdResult === 'object' && !sessionIdResult.success) {
       return {
         success: false,
         errors: {
@@ -122,6 +134,7 @@ export async function removePresenterAction(
         },
       };
     }
+    const _sessionId = sessionIdResult as string;
 
     // Execute use case
     const repository = createGameRepository();
@@ -181,9 +194,8 @@ export async function addEpisodeAction(
     }
 
     // Get session (for future authorization)
-    const sessionId = await getCookie(COOKIE_NAMES.SESSION_ID);
-
-    if (!sessionId) {
+    const sessionIdResult = await getSessionIdOrError();
+    if (typeof sessionIdResult === 'object' && !sessionIdResult.success) {
       return {
         success: false,
         errors: {
@@ -191,6 +203,7 @@ export async function addEpisodeAction(
         },
       };
     }
+    const _sessionId = sessionIdResult as string;
 
     // Execute use case
     const repository = createGameRepository();
@@ -235,7 +248,8 @@ export async function getPresenterEpisodesAction(
 ): Promise<{ success: true; presenter: PresenterWithLieDto } | { success: false; error: string }> {
   try {
     // Get session
-    const sessionId = await getCookie(COOKIE_NAMES.SESSION_ID);
+    const sessionService = SessionServiceContainer.getSessionService();
+    const sessionId = await sessionService.getCurrentSessionId();
 
     if (!sessionId) {
       return {
@@ -277,7 +291,8 @@ export async function getPresentersAction(
 > {
   try {
     // Get session
-    const sessionId = await getCookie(COOKIE_NAMES.SESSION_ID);
+    const sessionService = SessionServiceContainer.getSessionService();
+    const sessionId = await sessionService.getCurrentSessionId();
 
     if (!sessionId) {
       return {
@@ -347,9 +362,8 @@ export async function addPresenterWithEpisodesAction(
     }
 
     // Get session (for future authorization)
-    const sessionId = await getCookie(COOKIE_NAMES.SESSION_ID);
-
-    if (!sessionId) {
+    const sessionIdResult = await getSessionIdOrError();
+    if (typeof sessionIdResult === 'object' && !sessionIdResult.success) {
       return {
         success: false,
         errors: {
@@ -357,6 +371,7 @@ export async function addPresenterWithEpisodesAction(
         },
       };
     }
+    const _sessionId = sessionIdResult as string;
 
     // Execute use case
     const repository = createGameRepository();

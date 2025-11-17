@@ -5,8 +5,7 @@
 import { redirect } from 'next/navigation';
 import { getGameDetailAction } from '@/app/actions/game';
 import { GameDetailPage, GameDetailPageError } from '@/components/pages/GameDetailPage';
-import { COOKIE_NAMES } from '@/lib/constants';
-import { getCookie } from '@/lib/cookies';
+import { SessionServiceContainer } from '@/server/infrastructure/di/SessionServiceContainer';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -18,7 +17,8 @@ interface PageProps {
  */
 export default async function Page({ params }: PageProps) {
   // Check session
-  const sessionId = await getCookie(COOKIE_NAMES.SESSION_ID);
+  const sessionService = SessionServiceContainer.getSessionService();
+  const sessionId = await sessionService.getCurrentSessionId();
   if (!sessionId) {
     redirect('/');
   }
