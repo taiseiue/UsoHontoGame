@@ -1,6 +1,6 @@
-import { PrismaClient } from '@/generated/prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
+import { PrismaClient } from '@/generated/prisma/client';
 
 /**
  * Test Database Utility for Integration Tests
@@ -16,7 +16,7 @@ export interface TestDatabase {
 /**
  * Creates an isolated test database for integration tests
  * Each test file gets its own SQLite database to avoid concurrency issues
- * 
+ *
  * @param testFileName - Name of the test file (used for unique DB naming)
  * @returns TestDatabase instance with PrismaClient and cleanup function
  */
@@ -40,10 +40,10 @@ export async function createTestDatabase(testFileName: string): Promise<TestData
   // Connect and create schema
   try {
     await prisma.$connect();
-    
+
     // Enable foreign key constraints
     await prisma.$executeRawUnsafe('PRAGMA foreign_keys = ON;');
-    
+
     // Create the database schema manually since migrations don't work with dynamic DB files
     await prisma.$executeRawUnsafe(`
       CREATE TABLE "Game" (
@@ -57,15 +57,15 @@ export async function createTestDatabase(testFileName: string): Promise<TestData
         "updatedAt" DATETIME NOT NULL
       )
     `);
-    
+
     await prisma.$executeRawUnsafe(`
       CREATE INDEX "Game_creatorId_idx" ON "Game"("creatorId")
     `);
-    
+
     await prisma.$executeRawUnsafe(`
       CREATE INDEX "Game_status_idx" ON "Game"("status")
     `);
-    
+
     await prisma.$executeRawUnsafe(`
       CREATE TABLE "Presenter" (
         "id" TEXT NOT NULL PRIMARY KEY,
@@ -75,11 +75,11 @@ export async function createTestDatabase(testFileName: string): Promise<TestData
         CONSTRAINT "Presenter_gameId_fkey" FOREIGN KEY ("gameId") REFERENCES "Game" ("id") ON DELETE CASCADE ON UPDATE CASCADE
       )
     `);
-    
+
     await prisma.$executeRawUnsafe(`
       CREATE INDEX "Presenter_gameId_idx" ON "Presenter"("gameId")
     `);
-    
+
     await prisma.$executeRawUnsafe(`
       CREATE TABLE "Episode" (
         "id" TEXT NOT NULL PRIMARY KEY,
@@ -90,11 +90,10 @@ export async function createTestDatabase(testFileName: string): Promise<TestData
         CONSTRAINT "Episode_presenterId_fkey" FOREIGN KEY ("presenterId") REFERENCES "Presenter" ("id") ON DELETE CASCADE ON UPDATE CASCADE
       )
     `);
-    
+
     await prisma.$executeRawUnsafe(`
       CREATE INDEX "Episode_presenterId_idx" ON "Episode"("presenterId")
     `);
-    
   } catch (error) {
     await prisma.$disconnect();
     throw new Error(`Failed to setup test database: ${error}`);
@@ -109,14 +108,14 @@ export async function createTestDatabase(testFileName: string): Promise<TestData
         await prisma.game.deleteMany();
       } catch (dbError) {
         // Ignore table not found errors during cleanup
-        if (dbError?.code !== 'P2021') {
+        if ((dbError as any)?.code !== 'P2021') {
           console.warn('Database cleanup error:', dbError);
         }
       }
-      
+
       // Disconnect
       await prisma.$disconnect();
-      
+
       // Remove database file
       if (fs.existsSync(databasePath)) {
         fs.unlinkSync(databasePath);
@@ -139,13 +138,13 @@ export async function createTestDatabase(testFileName: string): Promise<TestData
  */
 export async function cleanupAllTestDatabases(): Promise<void> {
   const prismaDir = path.resolve(process.cwd(), 'prisma');
-  
+
   if (!fs.existsSync(prismaDir)) {
     return;
   }
 
   const files = fs.readdirSync(prismaDir);
-  const testDbFiles = files.filter(file => file.startsWith('test-') && file.endsWith('.db'));
+  const testDbFiles = files.filter((file) => file.startsWith('test-') && file.endsWith('.db'));
 
   for (const file of testDbFiles) {
     try {

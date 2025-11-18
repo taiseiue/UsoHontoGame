@@ -1,28 +1,49 @@
 // Test utilities and mock data factories for component testing
 
+import { vi } from 'vitest';
 import type { GameDetail } from '@/components/pages/GameDetailPage/GameDetailPage.types';
 import type { UsePresenterManagementPageReturn } from '@/components/pages/PresenterManagementPage/PresenterManagementPage.types';
-import type { GameDto } from '@/server/application/dto/responses/GameDto';
-import type { PresenterWithLieDto } from '@/server/application/dto/responses/PresenterWithLieDto';
-import type { Game } from '@/server/domain/entities/Game';
+import type { GameDto } from '@/server/application/dto/GameDto';
+import type { PresenterWithLieDto } from '@/server/application/dto/PresenterWithLieDto';
+import { Game } from '@/server/domain/entities/Game';
+import { GameId } from '@/server/domain/value-objects/GameId';
+import { GameStatus, type GameStatusValue } from '@/server/domain/value-objects/GameStatus';
 
 /**
  * Mock Game entity factory
  */
-export const mockGame = (overrides: Partial<Game> = {}): Game => {
-  const defaultGame: Game = {
+export const mockGame = (overrides: Partial<{
+  id: string;
+  name: string | null;
+  status: string;
+  maxPlayers: number;
+  currentPlayers: number;
+  createdAt: Date;
+  updatedAt: Date;
+  creatorId: string;
+}> = {}): Game => {
+  const defaults = {
     id: 'test-game-id',
-    name: 'Test Game',
+    name: 'Test Game' as string | null,
+    status: '準備中',
     maxPlayers: 10,
     currentPlayers: 0,
-    status: '準備中',
     createdAt: new Date('2024-01-01T00:00:00Z'),
     updatedAt: new Date('2024-01-02T00:00:00Z'),
-    presenters: [],
+    creatorId: 'test-creator-id',
     ...overrides,
-  } as Game;
+  };
 
-  return defaultGame;
+  return new Game(
+    new GameId(defaults.id),
+    defaults.name,
+    new GameStatus(defaults.status as GameStatusValue),
+    defaults.maxPlayers,
+    defaults.currentPlayers,
+    defaults.createdAt,
+    defaults.updatedAt,
+    defaults.creatorId
+  );
 };
 
 /**
@@ -31,12 +52,7 @@ export const mockGame = (overrides: Partial<Game> = {}): Game => {
 export const mockGameDto = (overrides: Partial<GameDto> = {}): GameDto => ({
   id: 'test-game-id',
   name: 'Test Game',
-  status: '準備中',
-  currentPlayers: 5,
-  maxPlayers: 10,
   availableSlots: 5,
-  createdAt: '2024-01-01T00:00:00Z',
-  updatedAt: '2024-01-02T00:00:00Z',
   ...overrides,
 });
 
@@ -50,6 +66,7 @@ export const mockGameDetail = (overrides: Partial<GameDetail> = {}): GameDetail 
   maxPlayers: 10,
   currentPlayers: 5,
   availableSlots: 5,
+  creatorId: 'test-creator-id',
   createdAt: '2024-01-01T00:00:00Z',
   updatedAt: '2024-01-02T00:00:00Z',
   ...overrides,
@@ -62,8 +79,10 @@ export const mockPresenterWithLieDto = (
   overrides: Partial<PresenterWithLieDto> = {}
 ): PresenterWithLieDto => ({
   id: 'test-presenter-id',
+  gameId: 'test-game-id',
   nickname: 'Test Presenter',
   episodes: [],
+  createdAt: new Date('2024-01-01T00:00:00Z'),
   ...overrides,
 });
 

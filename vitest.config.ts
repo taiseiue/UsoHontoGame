@@ -9,14 +9,6 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./tests/setup.ts'],
     exclude: ['**/node_modules/**', '**/dist/**', '**/e2e/**', '**/*.spec.ts'],
-    // Configure test isolation for integration tests
-    poolMatchGlobs: [
-      // Each integration test file runs in its own isolated thread pool
-      ['**/tests/integration/repositories/**', 'threads'],
-      ['**/tests/integration/status-transition.test.ts', 'forks'],
-      // Unit tests can share pools safely
-      ['**/src/**/*.test.{ts,tsx}', 'threads'],
-    ],
     // Enable parallel execution but with proper isolation
     pool: 'threads',
     maxConcurrency: 2, // Limit concurrency for integration tests
