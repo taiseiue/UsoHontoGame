@@ -135,7 +135,7 @@ This is a full-stack Next.js application with Clean Architecture:
 
 ### Integration Tests
 
-- [ ] T046 [US1] Write and run integration test for full answer submission flow in tests/integration/answer-submission.test.ts (create participation, upsert answer, verify DB state)
+- [X] T046 [US1] Write and run integration test for full answer submission flow in tests/integration/answer-submission.test.ts (create participation, upsert answer, verify DB state)
 
 ### E2E Tests
 
