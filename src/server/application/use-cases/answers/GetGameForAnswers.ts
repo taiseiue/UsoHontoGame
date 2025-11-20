@@ -43,7 +43,20 @@ export class GetGameForAnswers {
 		}
 
 		// Fetch game
-		const gameIdObj = new GameId(gameId);
+		let gameIdObj: GameId;
+		try {
+			gameIdObj = new GameId(gameId);
+		} catch {
+			// Invalid UUID format - treat as not found
+			return {
+				success: false,
+				error: {
+					code: 'GAME_NOT_FOUND',
+					message: 'ゲームが見つかりません',
+				},
+			};
+		}
+
 		const game = await this.gameRepository.findById(gameIdObj);
 
 		if (!game) {

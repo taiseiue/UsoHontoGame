@@ -1,7 +1,7 @@
 // Use Case Tests: SubmitAnswer
 // Test-Driven Development: Write FAILING tests first
 
-import { describe, expect, it, beforeEach } from 'vitest';
+import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { SubmitAnswer } from './SubmitAnswer';
 import type { IAnswerRepository } from '@/server/domain/repositories/IAnswerRepository';
 import type { IParticipationRepository } from '@/server/domain/repositories/IParticipationRepository';
@@ -111,6 +111,79 @@ describe('SubmitAnswer Use Case', () => {
 			const result = await useCase.execute(request);
 
 			expect(result.success).toBe(true);
+		});
+
+		it('should increment currentPlayers and update game when new participant joins', async () => {
+			const gameId = '550e8400-e29b-41d4-a716-446655440000';
+			const game = new Game(
+				new GameId(gameId),
+				'Test Game',
+				new GameStatus('出題中'),
+				10,
+				5,
+				new Date(),
+				new Date(),
+			);
+
+			const initialPlayerCount = game.currentPlayers;
+
+			gameRepository.findById = async () => game;
+			participationRepository.exists = async () => false;
+
+			const updateSpy = vi.fn();
+			gameRepository.update = updateSpy;
+
+			const request: SubmitAnswerRequest = {
+				gameId,
+				sessionId: 'session-123',
+				nickname: 'TestUser',
+				selections: {
+					'presenter-1': 'episode-1',
+				},
+			};
+
+			const result = await useCase.execute(request);
+
+			expect(result.success).toBe(true);
+			expect(game.currentPlayers).toBe(initialPlayerCount + 1);
+			expect(updateSpy).toHaveBeenCalledWith(game);
+			expect(updateSpy).toHaveBeenCalledTimes(1);
+		});
+
+		it('should NOT increment currentPlayers when existing participant resubmits', async () => {
+			const gameId = '550e8400-e29b-41d4-a716-446655440001';
+			const game = new Game(
+				new GameId(gameId),
+				'Test Game',
+				new GameStatus('出題中'),
+				10,
+				5,
+				new Date(),
+				new Date(),
+			);
+
+			const initialPlayerCount = game.currentPlayers;
+
+			gameRepository.findById = async () => game;
+			participationRepository.exists = async () => true; // Existing participant
+
+			const updateSpy = vi.fn();
+			gameRepository.update = updateSpy;
+
+			const request: SubmitAnswerRequest = {
+				gameId,
+				sessionId: 'session-123',
+				nickname: 'TestUser',
+				selections: {
+					'presenter-1': 'episode-2',
+				},
+			};
+
+			const result = await useCase.execute(request);
+
+			expect(result.success).toBe(true);
+			expect(game.currentPlayers).toBe(initialPlayerCount); // Should not change
+			expect(updateSpy).not.toHaveBeenCalled(); // Should not be called
 		});
 	});
 

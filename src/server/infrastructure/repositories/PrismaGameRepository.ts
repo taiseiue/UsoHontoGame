@@ -353,6 +353,7 @@ export class PrismaGameRepository implements IGameRepository {
   /**
    * Find active games with pagination and player count
    * Feature: 005-top-active-games
+   * Note: Uses actual participation count from database for accuracy
    */
   async findActiveGamesWithPagination(params: { limit: number; skip: number }): Promise<{
     games: Array<{
@@ -364,12 +365,17 @@ export class PrismaGameRepository implements IGameRepository {
     }>;
     total: number;
   }> {
-    // Fetch games with current player count
+    // Fetch games with actual participation count
     const games = await this.prisma.game.findMany({
       where: { status: '出題中' },
       orderBy: { createdAt: 'desc' },
       take: params.limit,
       skip: params.skip,
+      include: {
+        _count: {
+          select: { participations: true },
+        },
+      },
     });
 
     // Get total count
@@ -383,7 +389,7 @@ export class PrismaGameRepository implements IGameRepository {
         id: game.id,
         title: game.name || 'Untitled Game',
         createdAt: game.createdAt,
-        playerCount: game.currentPlayers,
+        playerCount: game._count.participations, // Use actual participation count
         playerLimit: game.maxPlayers,
       })),
       total,

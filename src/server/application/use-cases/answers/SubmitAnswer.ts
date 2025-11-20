@@ -50,7 +50,20 @@ export class SubmitAnswer {
 		}
 
 		// Fetch and validate game
-		const gameId = new GameId(request.gameId);
+		let gameId: GameId;
+		try {
+			gameId = new GameId(request.gameId);
+		} catch {
+			// Invalid UUID format - treat as not found
+			return {
+				success: false,
+				error: {
+					code: 'GAME_NOT_FOUND',
+					message: 'ゲームが見つかりません',
+				},
+			};
+		}
+
 		const game = await this.gameRepository.findById(gameId);
 
 		if (!game) {
@@ -106,6 +119,10 @@ export class SubmitAnswer {
 			});
 
 			await this.participationRepository.create(participation);
+
+			// Update game's current player count
+			game.addPlayer();
+			await this.gameRepository.update(game);
 		}
 
 		// Upsert answer
