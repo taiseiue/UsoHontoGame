@@ -71,6 +71,30 @@ export class PrismaAnswerRepository implements IAnswerRepository {
     });
   }
 
+  async findSelectionsByAnswer(
+    answerId: string
+  ): Promise<Array<{ presenterId: string; episodeId: string }>> {
+    const answer = await this.prisma.answer.findUnique({
+      where: { id: answerId },
+    });
+
+    if (!answer) {
+      return [];
+    }
+
+    // Parse selections from JSON
+    const selections =
+      typeof answer.selections === 'string' ? JSON.parse(answer.selections) : answer.selections;
+
+    // Convert selections object to array of {presenterId, episodeId}
+    return Object.entries(selections as Record<string, string>).map(
+      ([presenterId, episodeId]) => ({
+        presenterId,
+        episodeId,
+      })
+    );
+  }
+
   private toDomain(answer: {
     id: string;
     sessionId: string;
@@ -84,11 +108,14 @@ export class PrismaAnswerRepository implements IAnswerRepository {
     const selections =
       typeof answer.selections === 'string' ? JSON.parse(answer.selections) : answer.selections;
 
-    return AnswerEntity.create({
+    return AnswerEntity.reconstruct({
+      id: answer.id,
       sessionId: answer.sessionId,
       gameId: answer.gameId,
       nickname: answer.nickname,
       selections: selections as Record<string, string>,
+      createdAt: answer.createdAt,
+      updatedAt: answer.updatedAt,
     });
   }
 }

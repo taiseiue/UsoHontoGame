@@ -73,7 +73,17 @@ export class SubmitAnswer {
       };
     }
 
-    // Validate game status
+    // Validate game status - must be in '出題中' (accepting responses)
+    if (game.status.toString() === '準備中') {
+      return {
+        success: false,
+        error: {
+          code: 'GAME_NOT_STARTED',
+          message: 'このゲームはまだ開始されていません',
+        },
+      };
+    }
+
     if (game.status.toString() === '締切') {
       return {
         success: false,
@@ -82,6 +92,23 @@ export class SubmitAnswer {
           message: 'このゲームは締め切られました',
         },
       };
+    }
+
+    // Validate that all presenters have selections
+    const presenters = await this.gameRepository.findPresentersByGameId(request.gameId);
+    const presenterIds = presenters.map((p) => p.id);
+
+    // Check if all presenters have a selection
+    for (const presenterId of presenterIds) {
+      if (!request.selections[presenterId]) {
+        return {
+          success: false,
+          error: {
+            code: 'INCOMPLETE_SELECTIONS',
+            message: 'すべての出題者の回答を選択してください',
+          },
+        };
+      }
     }
 
     // Check if participant exists
@@ -118,13 +145,33 @@ export class SubmitAnswer {
       await this.gameRepository.update(game);
     }
 
-    // Upsert answer
-    const answer = AnswerEntity.create({
-      sessionId: request.sessionId,
-      gameId: request.gameId,
-      nickname: request.nickname,
-      selections: request.selections,
-    });
+    // Check if answer already exists
+    const existingAnswer = await this.answerRepository.findBySessionAndGame(
+      request.sessionId,
+      request.gameId
+    );
+
+    let answer: AnswerEntity;
+    if (existingAnswer) {
+      // Update existing answer (preserves ID)
+      answer = AnswerEntity.reconstruct({
+        id: existingAnswer.id,
+        sessionId: request.sessionId,
+        gameId: request.gameId,
+        nickname: request.nickname,
+        selections: request.selections,
+        createdAt: existingAnswer.createdAt,
+        updatedAt: new Date(),
+      });
+    } else {
+      // Create new answer (generates new ID)
+      answer = AnswerEntity.create({
+        sessionId: request.sessionId,
+        gameId: request.gameId,
+        nickname: request.nickname,
+        selections: request.selections,
+      });
+    }
 
     await this.answerRepository.upsert(answer);
 

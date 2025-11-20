@@ -25,4 +25,15 @@ export interface IAnswerRepository {
    * Delete an answer by session and game
    */
   delete(sessionId: string, gameId: string): Promise<void>;
+
+  /**
+   * Find all selections for a specific answer
+   * Returns array of selections with presenter and episode information
+   */
+  findSelectionsByAnswer(answerId: string): Promise<
+    Array<{
+      presenterId: string;
+      episodeId: string;
+    }>
+  >;
 }

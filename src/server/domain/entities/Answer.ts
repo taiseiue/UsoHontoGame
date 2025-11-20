@@ -61,6 +61,31 @@ export class AnswerEntity {
     });
   }
 
+  /**
+   * Reconstruct an existing entity from persistence (preserves existing ID and timestamps)
+   */
+  static reconstruct(props: {
+    id: string;
+    sessionId: string;
+    gameId: string;
+    nickname: string;
+    selections: Record<string, string>;
+    createdAt: Date;
+    updatedAt: Date;
+  }): AnswerEntity {
+    const selectionsMap = new Map<string, string>(Object.entries(props.selections));
+
+    return new AnswerEntity({
+      id: props.id,
+      sessionId: props.sessionId,
+      gameId: props.gameId,
+      nickname: props.nickname,
+      selections: selectionsMap,
+      createdAt: props.createdAt,
+      updatedAt: props.updatedAt,
+    });
+  }
+
   get id(): string {
     return this.props.id;
   }
