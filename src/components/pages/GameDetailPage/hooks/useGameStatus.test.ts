@@ -21,7 +21,10 @@ describe('useGameStatus', () => {
     vi.mocked(mockCloseGameAction).mockReset();
 
     // Mock window.confirm to return true by default
-    vi.stubGlobal('confirm', vi.fn(() => true));
+    vi.stubGlobal(
+      'confirm',
+      vi.fn(() => true)
+    );
   });
 
   describe('initialization', () => {

@@ -87,12 +87,10 @@ export class PrismaAnswerRepository implements IAnswerRepository {
       typeof answer.selections === 'string' ? JSON.parse(answer.selections) : answer.selections;
 
     // Convert selections object to array of {presenterId, episodeId}
-    return Object.entries(selections as Record<string, string>).map(
-      ([presenterId, episodeId]) => ({
-        presenterId,
-        episodeId,
-      })
-    );
+    return Object.entries(selections as Record<string, string>).map(([presenterId, episodeId]) => ({
+      presenterId,
+      episodeId,
+    }));
   }
 
   private toDomain(answer: {

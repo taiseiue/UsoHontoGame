@@ -357,10 +357,7 @@ describe('useEpisodeForm', () => {
       });
 
       expect(result.current.isSuccess).toBe(false);
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Form submission error:',
-        expect.any(Error)
-      );
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Form submission error:', expect.any(Error));
 
       consoleErrorSpy.mockRestore();
     });

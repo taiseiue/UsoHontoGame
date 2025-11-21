@@ -11,6 +11,7 @@ Auto-generated from all feature plans. Last updated: 2025-11-11
 - TypeScript 5 (strict mode) / Node.js 20 + Next.js 16.0.1, React 19.2.0, Prisma 6.19.0, Tailwind CSS v4 (005-top-active-games)
 - TypeScript 5 (strict mode) + Next.js 16.0.1 (App Router), React 19.2.0, Prisma 6.19.0, Zod 4.1.12 (001-lie-detection-answers)
 - SQLite via Prisma (file: `prisma/dev.db`) (001-lie-detection-answers)
+- TypeScript 5 (strict mode) + Next.js 16.0.1, React 19.2.0 + Next.js 16.0.1, React 19.2.0, Prisma 6.19.0, Zod 4.1.12, Tailwind CSS v4, nanoid 5.1.6 (006-results-dashboard)
 
 **Language & Framework**:
 - TypeScript 5 with strict mode enabled
@@ -290,6 +291,7 @@ npm run check              # Lint and format with Biome
    - React Query integration for state management
 
 ## Recent Changes
+- 006-results-dashboard: Added TypeScript 5 (strict mode) + Next.js 16.0.1, React 19.2.0 + Next.js 16.0.1, React 19.2.0, Prisma 6.19.0, Zod 4.1.12, Tailwind CSS v4, nanoid 5.1.6
 - 001-lie-detection-answers: Added TypeScript 5 (strict mode) + Next.js 16.0.1 (App Router), React 19.2.0, Prisma 6.19.0, Zod 4.1.12
 - 005-top-active-games: Implemented TOP active games display (Phases 1-5 complete)
   - Created ActiveGameCard, ActiveGamesList, EmptyState components
@@ -299,7 +301,6 @@ npm run check              # Lint and format with Biome
   - Accessibility features (ARIA labels, keyboard support)
   - 28 tests passing (6 use case + 8 TopPage + 14 ActiveGameCard)
   - React Query provider setup for future auto-refresh
-- 004-status-transition: Added TypeScript 5 (strict mode) + Next.js 16.0.1, React 19.2.0, Tailwind CSS v4, Zod 4.1.12
   - Added Prisma ORM integration
   - Database schema with migrations
   - Repository pattern with SQLite implementation
