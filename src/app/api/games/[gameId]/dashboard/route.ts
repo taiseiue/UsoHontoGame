@@ -6,8 +6,8 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { GetResponseStatus } from '@/server/application/use-cases/results/GetResponseStatus';
 import { SessionServiceContainer } from '@/server/infrastructure/di/SessionServiceContainer';
-import { createGameRepository } from '@/server/infrastructure/repositories';
-import { createAnswerRepository } from '@/server/infrastructure/repositories/AnswerRepositoryFactory';
+import { createGameRepository, createAnswerRepository } from '@/server/infrastructure/repositories';
+import { GameId } from '@/server/domain/value-objects/GameId';
 
 export async function GET(
   request: NextRequest,
@@ -62,8 +62,8 @@ export async function GET(
     }
 
     // Verify authorization (only game creator can view dashboard)
-    const game = await gameRepository.findById(gameId);
-    if (game && game.creatorSessionId !== sessionId) {
+    const game = await gameRepository.findById(new GameId(gameId));
+    if (game && game.creatorId !== sessionId) {
       return NextResponse.json(
         {
           error: 'Forbidden',

@@ -8,6 +8,7 @@ import type {
   ResponseStatusDto,
   ParticipantStatusDto,
 } from '@/server/application/dto/ResponseStatusDto';
+import { GameId } from '@/server/domain/value-objects/GameId';
 
 type Result<T> = { success: true; data: T } | { success: false; errors: Record<string, string[]> };
 
@@ -19,7 +20,7 @@ export class GetResponseStatus {
 
   async execute(gameId: string): Promise<Result<ResponseStatusDto>> {
     // Find game
-    const game = await this.gameRepository.findById(gameId);
+    const game = await this.gameRepository.findById(new GameId(gameId));
     if (!game) {
       return {
         success: false,
@@ -28,7 +29,7 @@ export class GetResponseStatus {
     }
 
     // Validate game status
-    if (game.status !== '出題中') {
+    if (game.status.toString() !== '出題中') {
       return {
         success: false,
         errors: {
@@ -57,9 +58,9 @@ export class GetResponseStatus {
     return {
       success: true,
       data: {
-        gameId: game.id,
-        gameName: game.name,
-        gameStatus: game.status,
+        gameId: game.id.toString(),
+        gameName: game.name ?? '',
+        gameStatus: game.status.toString() as '準備中' | '出題中' | '締切',
         participants,
         totalParticipants,
         submittedCount,

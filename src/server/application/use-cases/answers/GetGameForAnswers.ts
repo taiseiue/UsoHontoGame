@@ -83,7 +83,7 @@ export class GetGameForAnswers {
       success: true,
       data: {
         id: game.id.toString(),
-        name: game.name,
+        name: game.name ?? '',
         status: game.status.toString(),
         maxPlayers: game.maxPlayers,
         currentPlayers: game.currentPlayers,

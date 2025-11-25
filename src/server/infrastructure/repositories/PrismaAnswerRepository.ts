@@ -1,7 +1,7 @@
 // Infrastructure: Prisma Answer Repository
 // Implements IAnswerRepository interface using Prisma ORM
 
-import type { PrismaClient } from '@/generated/prisma';
+import type { PrismaClient } from '@/generated/prisma/client';
 import { AnswerEntity } from '@/server/domain/entities/Answer';
 import type { IAnswerRepository } from '@/server/domain/repositories/IAnswerRepository';
 

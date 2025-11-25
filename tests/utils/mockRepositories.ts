@@ -124,5 +124,24 @@ export function createMockGameRepository(): IGameRepository {
       episodes.set(episode.id, episode);
       return episode;
     }),
+
+    findActiveGamesWithPagination: vi
+      .fn()
+      .mockImplementation(async (params: { limit: number; skip: number }) => {
+        const activeGames = Array.from(games.values()).filter(
+          (game) => game.status.toString() === '出題中'
+        );
+        const paginatedGames = activeGames.slice(params.skip, params.skip + params.limit);
+        return {
+          games: paginatedGames.map((game) => ({
+            id: game.id.toString(),
+            title: game.name ?? '',
+            createdAt: new Date(),
+            playerCount: game.currentPlayers,
+            playerLimit: game.maxPlayers,
+          })),
+          total: activeGames.length,
+        };
+      }),
   };
 }

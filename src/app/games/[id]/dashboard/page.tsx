@@ -6,8 +6,8 @@ import { redirect } from 'next/navigation';
 import { ResponseStatusPage } from '@/components/pages/ResponseStatusPage';
 import { SessionServiceContainer } from '@/server/infrastructure/di/SessionServiceContainer';
 import { GetResponseStatus } from '@/server/application/use-cases/results/GetResponseStatus';
-import { createGameRepository } from '@/server/infrastructure/repositories';
-import { createAnswerRepository } from '@/server/infrastructure/repositories/AnswerRepositoryFactory';
+import { createGameRepository, createAnswerRepository } from '@/server/infrastructure/repositories';
+import { GameId } from '@/server/domain/value-objects/GameId';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -36,8 +36,8 @@ export default async function Page({ params }: PageProps) {
   const result = await useCase.execute(gameId);
 
   // Check authorization - verify user is game creator
-  const game = await gameRepository.findById(gameId);
-  if (game && game.creatorSessionId !== sessionId) {
+  const game = await gameRepository.findById(new GameId(gameId));
+  if (game && game.creatorId !== sessionId) {
     // Not authorized - redirect to game detail page
     redirect(`/games/${gameId}`);
   }

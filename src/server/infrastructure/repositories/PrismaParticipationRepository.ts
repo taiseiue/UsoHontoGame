@@ -1,7 +1,7 @@
 // Infrastructure: Prisma Participation Repository
 // Implements IParticipationRepository interface using Prisma ORM
 
-import type { PrismaClient } from '@/generated/prisma';
+import type { PrismaClient } from '@/generated/prisma/client';
 import { ParticipationEntity } from '@/server/domain/entities/Participation';
 import type { IParticipationRepository } from '@/server/domain/repositories/IParticipationRepository';
 
