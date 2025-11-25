@@ -213,3 +213,41 @@ export const animationSequences = {
     );
   },
 };
+
+/**
+ * Confetti animation utilities for celebration effects
+ * Feature: 006-results-dashboard, User Story 3
+ */
+
+export interface ConfettiParticle {
+  x: number;
+  y: number;
+  rotation: number;
+  scale: number;
+  color: string;
+  velocity: { x: number; y: number };
+}
+
+/**
+ * Generate random confetti particles for celebration animation
+ */
+export function generateConfettiParticles(count: number): ConfettiParticle[] {
+  const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#a8dadc', '#f1faee', '#95e1d3', '#ff9ff3'];
+  const particles: ConfettiParticle[] = [];
+
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x: Math.random() * 100,
+      y: -10,
+      rotation: Math.random() * 360,
+      scale: 0.5 + Math.random() * 0.5,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      velocity: {
+        x: (Math.random() - 0.5) * 2,
+        y: 1 + Math.random() * 2,
+      },
+    });
+  }
+
+  return particles;
+}
