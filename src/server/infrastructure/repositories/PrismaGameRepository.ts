@@ -362,6 +362,7 @@ export class PrismaGameRepository implements IGameRepository {
       createdAt: Date;
       playerCount: number;
       playerLimit: number | null;
+      creatorId: string;
     }>;
     total: number;
   }> {
@@ -391,6 +392,7 @@ export class PrismaGameRepository implements IGameRepository {
         createdAt: game.createdAt,
         playerCount: game._count.participations, // Use actual participation count
         playerLimit: game.maxPlayers,
+        creatorId: game.creatorId,
       })),
       total,
     };

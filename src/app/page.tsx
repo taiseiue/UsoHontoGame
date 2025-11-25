@@ -1,5 +1,5 @@
 // App Router Page: TOP/Home
-// Feature: 001-session-top-page, 005-top-active-games
+// Feature: 001-session-top-page, 005-top-active-games, 006-results-dashboard
 // Server Component that handles session management and delegates to TopPage components
 
 import { createSessionAction, validateSessionAction } from '@/app/actions/session';
@@ -11,6 +11,7 @@ import { TopPageWithData } from '@/components/pages/TopPage/TopPageWithData';
  * Handles session validation, session creation, and state routing
  *
  * Feature 005: Now uses TopPageWithData with auto-refresh capability
+ * Feature 006: Passes sessionId for dashboard authorization
  */
 export default async function Page() {
   // 1. Validate existing session
@@ -31,5 +32,8 @@ export default async function Page() {
 
   // 4. Render page component with auto-refresh (Feature 005)
   // Data fetching now happens in Client Component with React Query
-  return <TopPageWithData nickname={session.nickname || ''} />;
+  // Pass sessionId for dashboard authorization (Feature 006)
+  return (
+    <TopPageWithData nickname={session.nickname || ''} currentSessionId={session.sessionId || ''} />
+  );
 }

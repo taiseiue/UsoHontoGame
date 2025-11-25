@@ -26,11 +26,12 @@ export function TopPageNicknameSetup() {
  * Pure presentational component with no business logic
  *
  * Feature 005: Now displays only active games (出題中 status)
+ * Feature 006: Passes currentSessionId for dashboard authorization
  * Shows empty state when no active games available
  *
- * @param props - Component props including nickname and games
+ * @param props - Component props including nickname, games, and currentSessionId
  */
-export function TopPage({ nickname, games }: TopPageProps) {
+export function TopPage({ nickname, games, currentSessionId }: TopPageProps) {
   const hasGames = games && games.length > 0;
 
   return (
@@ -45,7 +46,7 @@ export function TopPage({ nickname, games }: TopPageProps) {
         </div>
 
         {hasGames ? (
-          <ActiveGamesList games={games} />
+          <ActiveGamesList games={games} currentSessionId={currentSessionId} />
         ) : (
           <EmptyState
             message="現在、出題中のゲームはありません"

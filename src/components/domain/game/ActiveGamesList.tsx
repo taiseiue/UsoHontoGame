@@ -1,6 +1,7 @@
 /**
  * ActiveGamesList Component
  * Feature: 005-top-active-games (User Story 2)
+ * Feature: 006-results-dashboard (Dashboard navigation support)
  *
  * Container component that renders a list of ActiveGameCard components
  * Handles layout and spacing for multiple game cards
@@ -12,13 +13,15 @@ import { ActiveGameCard } from './ActiveGameCard';
 export interface ActiveGamesListProps {
   /** Array of active games to display */
   games: ActiveGameListItem[];
+  /** Current user's session ID (for creator authorization) */
+  currentSessionId?: string;
 }
 
 /**
  * ActiveGamesList - Pure presentational component
  * Renders a grid of game cards with responsive layout
  */
-export function ActiveGamesList({ games }: ActiveGamesListProps) {
+export function ActiveGamesList({ games, currentSessionId }: ActiveGamesListProps) {
   if (games.length === 0) {
     return null;
   }
@@ -31,7 +34,7 @@ export function ActiveGamesList({ games }: ActiveGamesListProps) {
     >
       {games.map((game) => (
         <div key={game.id} role="listitem">
-          <ActiveGameCard game={game} />
+          <ActiveGameCard game={game} currentSessionId={currentSessionId} />
         </div>
       ))}
     </div>

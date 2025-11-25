@@ -42,6 +42,8 @@ export interface ActiveGameListItem {
   playerLimit: number | null;
   /** Human-readable relative time (e.g., "2時間前") */
   formattedCreatedAt: string;
+  /** Session ID of the game creator (for authorization checks) */
+  creatorId: string;
 }
 
 /**

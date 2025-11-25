@@ -123,7 +123,7 @@ export interface IGameRepository {
   /**
    * Find active games with pagination and player count
    * @param params Pagination parameters
-   * @returns Games with metadata
+   * @returns Games with metadata including creator ID
    */
   findActiveGamesWithPagination(params: { limit: number; skip: number }): Promise<{
     games: Array<{
@@ -132,6 +132,7 @@ export interface IGameRepository {
       createdAt: Date;
       playerCount: number;
       playerLimit: number | null;
+      creatorId: string;
     }>;
     total: number;
   }>;

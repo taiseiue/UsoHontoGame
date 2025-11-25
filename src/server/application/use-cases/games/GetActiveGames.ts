@@ -59,6 +59,7 @@ export class GetActiveGames {
     createdAt: Date;
     playerCount: number;
     playerLimit: number | null;
+    creatorId: string;
   }): ActiveGameListItem {
     return {
       id: game.id,
@@ -67,6 +68,7 @@ export class GetActiveGames {
       playerCount: game.playerCount,
       playerLimit: game.playerLimit,
       formattedCreatedAt: formatRelativeTime(game.createdAt),
+      creatorId: game.creatorId,
     };
   }
 }

@@ -13,10 +13,13 @@ export type TopPageNicknameSetupProps = Record<string, never>;
  * Props for TopPage component
  * Displayed when user has nickname set
  * Updated for 005: Now uses ActiveGameListItem for active games display
+ * Updated for 006: Now includes currentSessionId for dashboard authorization
  */
 export interface TopPageProps {
   /** User's nickname */
   nickname: string;
   /** List of active games (出題中 status only) */
   games: ActiveGameListItem[];
+  /** Current user's session ID (for creator authorization) */
+  currentSessionId: string;
 }

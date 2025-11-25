@@ -1,6 +1,7 @@
 /**
  * TopPageWithData - Client Component Wrapper
  * Feature: 005-top-active-games (User Story 4)
+ * Feature: 006-results-dashboard (Dashboard authorization support)
  *
  * Wraps TopPage with auto-refresh functionality using React Query
  * Handles loading states and error states
@@ -15,13 +16,15 @@ import { EmptyState } from '@/components/ui/EmptyState';
 export interface TopPageWithDataProps {
   /** User's nickname from session */
   nickname: string;
+  /** Current user's session ID (for creator authorization) */
+  currentSessionId: string;
 }
 
 /**
  * Client Component that fetches active games with auto-refresh
  * Displays loading state on initial load, then uses background refresh
  */
-export function TopPageWithData({ nickname }: TopPageWithDataProps) {
+export function TopPageWithData({ nickname, currentSessionId }: TopPageWithDataProps) {
   const { games, isLoading, isFetching, error, refetch } = useActiveGames();
 
   // Show loading skeleton only on initial load
@@ -110,7 +113,7 @@ export function TopPageWithData({ nickname }: TopPageWithDataProps) {
   return (
     <>
       {loadingIndicator}
-      <TopPage nickname={nickname} games={games} />
+      <TopPage nickname={nickname} games={games} currentSessionId={currentSessionId} />
     </>
   );
 }
