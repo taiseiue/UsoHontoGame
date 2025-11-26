@@ -227,7 +227,7 @@ describe('Status Transition Integration', () => {
       expect(validationResult.errors).toHaveLength(0);
 
       const closeUseCase = new CloseGame(repository);
-      const result = await closeUseCase.execute({ gameId });
+      const result = await closeUseCase.execute({ gameId, sessionId });
 
       // Assert: Game status should be updated
       expect(result.success).toBe(true);
@@ -267,7 +267,7 @@ describe('Status Transition Integration', () => {
       await startUseCase.execute({ gameId });
 
       const closeUseCase = new CloseGame(repository);
-      await closeUseCase.execute({ gameId });
+      await closeUseCase.execute({ gameId, sessionId });
 
       // Act: Try to transition closed game
       const validateUseCase = new ValidateStatusTransition(repository);
@@ -309,7 +309,7 @@ describe('Status Transition Integration', () => {
 
       // Step 4: Transition to 締切
       const closeUseCase = new CloseGame(repository);
-      await closeUseCase.execute({ gameId });
+      await closeUseCase.execute({ gameId, sessionId });
 
       game = await repository.findById(new GameId(gameId));
       expect(game?.status.value).toBe('締切');

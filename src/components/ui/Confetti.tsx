@@ -5,7 +5,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { generateConfettiParticles, type ConfettiParticle } from '@/lib/animations';
+import { type ConfettiParticle, generateConfettiParticles } from '@/lib/animations';
 
 export interface ConfettiProps {
   active: boolean;

@@ -7,7 +7,6 @@
 'use client';
 
 import { useCloseGame } from '@/components/pages/GameDetailPage/hooks/useCloseGame';
-import type { GameStatus } from '@/server/domain/value-objects/GameStatus';
 
 export interface CloseGameButtonProps {
   gameId: string;

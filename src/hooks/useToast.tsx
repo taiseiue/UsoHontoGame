@@ -33,26 +33,29 @@ interface UseToastReturn {
 export function useToast(): UseToastReturn {
   const [toasts, setToasts] = useState<ToastProps[]>([]);
 
-  const addToast = useCallback((options: AddToastOptions): string => {
-    const id = `toast-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+  const addToast = useCallback(
+    (options: AddToastOptions): string => {
+      const id = `toast-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
-    const newToast: ToastProps = {
-      id,
-      type: options.type,
-      title: options.title,
-      message: options.message,
-      duration: options.duration || (options.type === 'error' ? 6000 : 4000), // Errors stay longer
-      onClose: removeToast,
-    };
+      const newToast: ToastProps = {
+        id,
+        type: options.type,
+        title: options.title,
+        message: options.message,
+        duration: options.duration || (options.type === 'error' ? 6000 : 4000), // Errors stay longer
+        onClose: removeToast,
+      };
 
-    setToasts((prev) => {
-      // Limit to 5 toasts maximum
-      const updatedToasts = [newToast, ...prev].slice(0, 5);
-      return updatedToasts;
-    });
+      setToasts((prev) => {
+        // Limit to 5 toasts maximum
+        const updatedToasts = [newToast, ...prev].slice(0, 5);
+        return updatedToasts;
+      });
 
-    return id;
-  }, []);
+      return id;
+    },
+    [removeToast]
+  );
 
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));

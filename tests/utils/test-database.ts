@@ -156,7 +156,8 @@ export async function createTestDatabase(testFileName: string): Promise<TestData
         await prisma.game.deleteMany();
       } catch (dbError) {
         // Ignore table not found errors during cleanup
-        if ((dbError as any)?.code !== 'P2021') {
+        const prismaError = dbError as { code?: string };
+        if (prismaError.code !== 'P2021') {
           console.warn('Database cleanup error:', dbError);
         }
       }

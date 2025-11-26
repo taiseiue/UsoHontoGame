@@ -27,6 +27,7 @@ export interface GameSummary {
 /**
  * Active game list item for TOP page display
  * Feature: 005-top-active-games
+ * Feature: 007-game-closure - Added status field to display game state
  * Contains information needed to display an active game in the list
  */
 export interface ActiveGameListItem {
@@ -44,6 +45,8 @@ export interface ActiveGameListItem {
   formattedCreatedAt: string;
   /** Session ID of the game creator (for authorization checks) */
   creatorId: string;
+  /** Current game status */
+  status: '出題中' | '締切';
 }
 
 /**

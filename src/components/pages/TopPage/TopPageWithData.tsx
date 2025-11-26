@@ -9,9 +9,9 @@
 
 'use client';
 
-import { TopPage } from './index';
-import { useActiveGames } from './hooks/useActiveGames';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { useActiveGames } from './hooks/useActiveGames';
+import { TopPage } from './index';
 
 export interface TopPageWithDataProps {
   /** User's nickname from session */

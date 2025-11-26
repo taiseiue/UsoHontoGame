@@ -2,9 +2,9 @@
 // Feature: 006-results-dashboard, User Story 3
 // Returns final rankings with winner highlighting
 
-import type { IGameRepository } from '@/server/domain/repositories/IGameRepository';
-import type { IAnswerRepository } from '@/server/domain/repositories/IAnswerRepository';
 import type { RankingDto } from '@/server/application/dto/RankingDto';
+import type { IAnswerRepository } from '@/server/domain/repositories/IAnswerRepository';
+import type { IGameRepository } from '@/server/domain/repositories/IGameRepository';
 import { GameId } from '@/server/domain/value-objects/GameId';
 
 type Result<T> = { success: true; data: T } | { success: false; errors: Record<string, string[]> };
@@ -103,6 +103,29 @@ export class GetResults {
       };
     });
 
+    // Calculate average score
+    const totalScore = participantScores.reduce((sum, p) => sum + p.totalScore, 0);
+    const averageScore =
+      participantScores.length > 0
+        ? Math.round((totalScore / participantScores.length) * 10) / 10
+        : 0;
+
+    // Calculate median score
+    let medianScore = 0;
+    if (participantScores.length > 0) {
+      const sortedScores = [...participantScores].map((p) => p.totalScore).sort((a, b) => a - b);
+
+      if (sortedScores.length % 2 === 0) {
+        // Even: average of two middle values
+        const mid1 = sortedScores[sortedScores.length / 2 - 1];
+        const mid2 = sortedScores[sortedScores.length / 2];
+        medianScore = Math.round(((mid1 + mid2) / 2) * 10) / 10;
+      } else {
+        // Odd: middle value
+        medianScore = sortedScores[Math.floor(sortedScores.length / 2)];
+      }
+    }
+
     return {
       success: true,
       data: {
@@ -111,6 +134,8 @@ export class GetResults {
         rankings,
         totalParticipants: answers.length,
         highestScore,
+        averageScore,
+        medianScore,
         calculatedAt: new Date(),
       },
     };

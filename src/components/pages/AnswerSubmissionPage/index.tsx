@@ -9,8 +9,8 @@
 
 import type { FC } from 'react';
 import { GameAnswerForm } from '@/components/domain/answer/GameAnswerForm';
-import { useAnswerSubmissionPage } from './hooks/useAnswerSubmissionPage';
 import type { AnswerSubmissionPageProps } from './AnswerSubmissionPage.types';
+import { useAnswerSubmissionPage } from './hooks/useAnswerSubmissionPage';
 
 /**
  * Answer Submission Page

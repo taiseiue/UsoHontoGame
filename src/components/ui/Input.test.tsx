@@ -1,7 +1,7 @@
 // Component Tests: Input
 // UI Primitive component for text input with label and error states
 
-import { render, screen, fireEvent } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { Input } from './Input';
 

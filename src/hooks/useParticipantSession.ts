@@ -3,8 +3,8 @@
 
 'use client';
 
-import { validateSessionAction } from '@/app/actions/session';
 import { useEffect, useState } from 'react';
+import { validateSessionAction } from '@/app/actions/session';
 
 export interface ParticipantSession {
   isLoading: boolean;

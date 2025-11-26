@@ -2,8 +2,7 @@
 // Feature: 006-results-dashboard, User Story 1
 // TDD: Write tests FIRST
 
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ResponseStatusDto } from '@/server/application/dto/ResponseStatusDto';
 
 // Mock global fetch
@@ -22,7 +21,7 @@ describe('useResponseStatus', () => {
     vi.useRealTimers();
   });
 
-  const mockInitialData: ResponseStatusDto = {
+  const _mockInitialData: ResponseStatusDto = {
     gameId: 'game-123',
     gameName: 'Test Game',
     gameStatus: '出題中',

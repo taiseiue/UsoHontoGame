@@ -7,8 +7,8 @@
 'use client';
 
 import type { FC } from 'react';
-import { EpisodeSelector } from '../EpisodeSelector';
 import type { Episode } from '../EpisodeSelector';
+import { EpisodeSelector } from '../EpisodeSelector';
 
 export interface Presenter {
   id: string;
@@ -34,14 +34,10 @@ export const PresenterEpisodeList: FC<PresenterEpisodeListProps> = ({
   }
 
   return (
-    <ul role="list" aria-label="出題者一覧" className="space-y-6">
+    <ul aria-label="出題者一覧" className="space-y-6">
       {presenters.map((presenter) => (
         <li key={presenter.id}>
-          <section
-            role="region"
-            aria-label={`${presenter.name}のエピソード`}
-            className="border rounded-lg p-4"
-          >
+          <section aria-label={`${presenter.name}のエピソード`} className="border rounded-lg p-4">
             <h3 className="text-lg font-semibold mb-4 text-gray-900">{presenter.name}</h3>
             <EpisodeSelector
               episodes={presenter.episodes}

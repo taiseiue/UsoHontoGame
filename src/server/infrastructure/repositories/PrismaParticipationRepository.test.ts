@@ -3,8 +3,8 @@
 
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { ParticipationEntity } from '@/server/domain/entities/Participation';
-import { PrismaParticipationRepository } from './PrismaParticipationRepository';
 import { createTestDatabase, type TestDatabase } from '../../../../tests/utils/test-database';
+import { PrismaParticipationRepository } from './PrismaParticipationRepository';
 
 describe('PrismaParticipationRepository', () => {
   let testDb: TestDatabase;

@@ -4,7 +4,6 @@
 
 'use client';
 
-import { useState } from 'react';
 import { CloseGameButton } from '@/components/domain/game/CloseGameButton';
 import { DeleteGameButton } from '@/components/domain/game/DeleteGameButton';
 import { GameForm } from '@/components/domain/game/GameForm';
@@ -25,7 +24,6 @@ import { useGameStatus } from './hooks/useGameStatus';
  */
 export function GameDetailPage({ game, currentSessionId }: GameDetailPageProps) {
   const { toasts, showSuccess, showError, removeToast } = useToast();
-  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Status management hook
   const { currentStatus, isLoading } = useGameStatus({
@@ -34,11 +32,9 @@ export function GameDetailPage({ game, currentSessionId }: GameDetailPageProps) 
     onSuccess: (newStatus) => {
       const message = newStatus === '出題中' ? 'ゲームを開始しました' : 'ゲームを締切しました';
       showSuccess(message, 'ステータス更新完了');
-      setIsTransitioning(false);
     },
     onError: (error) => {
       showError(error, 'ステータス更新エラー');
-      setIsTransitioning(false);
     },
   });
 
@@ -66,18 +62,23 @@ export function GameDetailPage({ game, currentSessionId }: GameDetailPageProps) 
             </div>
             <div className="flex flex-col items-end space-y-3">
               <GameStatusBadge status={currentStatus} animated={true} />
-              <StatusTransitionButton
-                gameId={game.id}
-                currentStatus={currentStatus}
-                onSuccess={(newStatus) => {
-                  setIsTransitioning(true);
-                }}
-                onError={(error) => {
-                  showError(error, 'ステータス更新エラー');
-                  setIsTransitioning(false);
-                }}
-              />
-              {isModerator && (
+              {/* Show StatusTransitionButton for 準備中 (to start game) */}
+              {currentStatus === '準備中' && (
+                <StatusTransitionButton
+                  gameId={game.id}
+                  currentStatus={currentStatus}
+                  onSuccess={(newStatus) => {
+                    const message =
+                      newStatus === '出題中' ? 'ゲームを開始しました' : 'ゲームを締切しました';
+                    showSuccess(message, 'ステータス更新完了');
+                  }}
+                  onError={(error) => {
+                    showError(error, 'ステータス更新エラー');
+                  }}
+                />
+              )}
+              {/* Show CloseGameButton for 出題中 (to close game) - only for moderators */}
+              {currentStatus === '出題中' && isModerator && (
                 <CloseGameButton
                   gameId={game.id}
                   gameStatus={currentStatus as '準備中' | '出題中' | '締切'}
@@ -93,7 +94,7 @@ export function GameDetailPage({ game, currentSessionId }: GameDetailPageProps) 
         </div>
 
         {/* Loading Overlay */}
-        {(isLoading || isTransitioning) && (
+        {isLoading && (
           <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
             <div className="flex items-center space-x-2">
               <svg
@@ -116,9 +117,7 @@ export function GameDetailPage({ game, currentSessionId }: GameDetailPageProps) 
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 />
               </svg>
-              <p className="text-sm font-medium text-blue-800">
-                {isTransitioning ? 'ステータス更新中...' : 'データを更新中...'}
-              </p>
+              <p className="text-sm font-medium text-blue-800">データを更新中...</p>
             </div>
           </div>
         )}
@@ -141,7 +140,7 @@ export function GameDetailPage({ game, currentSessionId }: GameDetailPageProps) 
               <dt className="text-sm font-medium text-gray-500">ステータス</dt>
               <dd className="mt-1 flex items-center">
                 <GameStatusBadge status={currentStatus} className="mr-2" animated={true} />
-                {(isLoading || isTransitioning) && (
+                {isLoading && (
                   <div className="flex items-center space-x-1">
                     <svg
                       className="h-3 w-3 animate-spin text-gray-500"

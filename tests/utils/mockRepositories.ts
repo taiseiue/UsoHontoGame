@@ -129,7 +129,7 @@ export function createMockGameRepository(): IGameRepository {
       .fn()
       .mockImplementation(async (params: { limit: number; skip: number }) => {
         const activeGames = Array.from(games.values()).filter(
-          (game) => game.status.toString() === '出題中'
+          (game) => game.status.toString() === '出題中' || game.status.toString() === '締切'
         );
         const paginatedGames = activeGames.slice(params.skip, params.skip + params.limit);
         return {
@@ -139,9 +139,46 @@ export function createMockGameRepository(): IGameRepository {
             createdAt: new Date(),
             playerCount: game.currentPlayers,
             playerLimit: game.maxPlayers,
+            creatorId: game.creatorId,
+            status: game.status.toString() as '出題中' | '締切',
           })),
           total: activeGames.length,
         };
       }),
+
+    findGamesWithStatusFilter: vi
+      .fn()
+      .mockImplementation(
+        async (params: {
+          limit: number;
+          skip: number;
+          statusFilter: '出題中' | '締切' | 'すべて';
+        }) => {
+          let filteredGames = Array.from(games.values());
+          if (params.statusFilter === '出題中') {
+            filteredGames = filteredGames.filter((game) => game.status.toString() === '出題中');
+          } else if (params.statusFilter === '締切') {
+            filteredGames = filteredGames.filter((game) => game.status.toString() === '締切');
+          } else {
+            // すべて: include both '出題中' and '締切'
+            filteredGames = filteredGames.filter(
+              (game) => game.status.toString() === '出題中' || game.status.toString() === '締切'
+            );
+          }
+          const paginatedGames = filteredGames.slice(params.skip, params.skip + params.limit);
+          return {
+            games: paginatedGames.map((game) => ({
+              id: game.id.toString(),
+              title: game.name ?? '',
+              createdAt: new Date(),
+              playerCount: game.currentPlayers,
+              playerLimit: game.maxPlayers,
+              creatorId: game.creatorId,
+              status: game.status.toString() as '出題中' | '締切',
+            })),
+            total: filteredGames.length,
+          };
+        }
+      ),
   };
 }

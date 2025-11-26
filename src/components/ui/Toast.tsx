@@ -45,7 +45,7 @@ export function Toast({ id, type, title, message, duration = 4000, onClose }: To
       clearTimeout(showTimer);
       clearTimeout(hideTimer);
     };
-  }, [duration]);
+  }, [duration, handleClose]);
 
   const handleClose = () => {
     setIsRemoving(true);
@@ -104,7 +104,6 @@ export function Toast({ id, type, title, message, duration = 4000, onClose }: To
           ),
           ariaLabel: '警告通知',
         };
-      case 'info':
       default:
         return {
           bgColor: 'bg-blue-50 border-blue-200',

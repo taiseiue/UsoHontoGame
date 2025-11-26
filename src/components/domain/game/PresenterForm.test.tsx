@@ -2,11 +2,11 @@
 // Feature: 002-game-preparation
 // Tests for presenter addition form with validation and submission
 
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
-import { PresenterForm } from './PresenterForm';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import type { PresenterWithLieDto } from '@/server/application/dto/PresenterWithLieDto';
+import { PresenterForm } from './PresenterForm';
 
 // Mock the usePresenterForm hook
 vi.mock('@/hooks/usePresenterForm', () => ({

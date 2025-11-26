@@ -3,7 +3,6 @@
 // TDD: Write tests FIRST, ensure they FAIL before implementation
 
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { PrismaClient } from '@prisma/client';
 
 // Test database setup will be similar to existing integration tests
 // TODO: Import test helpers once implementation starts

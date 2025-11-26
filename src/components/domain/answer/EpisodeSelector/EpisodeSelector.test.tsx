@@ -3,8 +3,8 @@
 // Task: T035
 
 import { render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AccessibilityProvider } from '@/components/ui/AccessibilityProvider';
 import { EpisodeSelector } from './index';
 
@@ -157,9 +157,9 @@ describe('EpisodeSelector', () => {
       );
 
       const buttons = screen.getAllByRole('button');
-      buttons.forEach((button) => {
+      for (const button of buttons) {
         expect(button).toHaveAttribute('data-selected', 'false');
-      });
+      }
     });
   });
 
@@ -268,9 +268,9 @@ describe('EpisodeSelector', () => {
       );
 
       const buttons = screen.getAllByRole('button');
-      buttons.forEach((button) => {
+      for (const button of buttons) {
         expect(button).toHaveAccessibleName();
-      });
+      }
     });
 
     it('should indicate selected state via aria-pressed', () => {
@@ -332,9 +332,9 @@ describe('EpisodeSelector', () => {
       );
 
       const buttons = screen.getAllByRole('button');
-      buttons.forEach((button) => {
+      for (const button of buttons) {
         expect(button).toBeDisabled();
-      });
+      }
     });
   });
 

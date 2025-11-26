@@ -1,13 +1,14 @@
 /**
  * ActiveGameCard Component Tests
  * Feature: 005-top-active-games (User Story 2)
- * Tests for displaying game information (title, player count, time)
+ * Feature: 007-game-closure (Status badge and closed game handling)
+ * Tests for displaying game information (title, player count, time, status)
  */
 
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { ActiveGameCard } from './ActiveGameCard';
 import type { ActiveGameListItem } from '@/types/game';
+import { ActiveGameCard } from './ActiveGameCard';
 
 describe('ActiveGameCard', () => {
   // T018: Test for displaying title
@@ -20,6 +21,8 @@ describe('ActiveGameCard', () => {
         playerCount: 5,
         playerLimit: 10,
         formattedCreatedAt: '10分前',
+        creatorId: 'creator-1',
+        status: '出題中',
       };
 
       render(<ActiveGameCard game={game} />);
@@ -35,6 +38,8 @@ describe('ActiveGameCard', () => {
         playerCount: 3,
         playerLimit: 8,
         formattedCreatedAt: '5分前',
+        creatorId: 'creator-1',
+        status: '出題中',
       };
 
       render(<ActiveGameCard game={game} />);
@@ -55,6 +60,8 @@ describe('ActiveGameCard', () => {
         playerCount: 5,
         playerLimit: 10,
         formattedCreatedAt: '15分前',
+        creatorId: 'creator-1',
+        status: '出題中',
       };
 
       render(<ActiveGameCard game={game} />);
@@ -70,6 +77,8 @@ describe('ActiveGameCard', () => {
         playerCount: 7,
         playerLimit: null,
         formattedCreatedAt: '20分前',
+        creatorId: 'creator-1',
+        status: '出題中',
       };
 
       render(<ActiveGameCard game={game} />);
@@ -85,6 +94,8 @@ describe('ActiveGameCard', () => {
         playerCount: 0,
         playerLimit: 5,
         formattedCreatedAt: 'たった今',
+        creatorId: 'creator-1',
+        status: '出題中',
       };
 
       render(<ActiveGameCard game={game} />);
@@ -103,6 +114,8 @@ describe('ActiveGameCard', () => {
         playerCount: 3,
         playerLimit: 10,
         formattedCreatedAt: '30分前',
+        creatorId: 'creator-1',
+        status: '出題中',
       };
 
       render(<ActiveGameCard game={game} />);
@@ -126,6 +139,8 @@ describe('ActiveGameCard', () => {
           playerCount: 1,
           playerLimit: 5,
           formattedCreatedAt: formatted,
+          creatorId: 'creator-1',
+          status: '出題中',
         };
 
         const { unmount } = render(<ActiveGameCard game={game} />);
@@ -145,6 +160,8 @@ describe('ActiveGameCard', () => {
         playerCount: 8,
         playerLimit: 12,
         formattedCreatedAt: '30分前',
+        creatorId: 'creator-1',
+        status: '出題中',
       };
 
       render(<ActiveGameCard game={game} />);
@@ -162,6 +179,8 @@ describe('ActiveGameCard', () => {
         playerCount: 4,
         playerLimit: 6,
         formattedCreatedAt: '10分前',
+        creatorId: 'creator-1',
+        status: '出題中',
       };
 
       const { container } = render(<ActiveGameCard game={game} />);
@@ -183,13 +202,15 @@ describe('ActiveGameCard', () => {
         playerCount: 5,
         playerLimit: 10,
         formattedCreatedAt: '10分前',
+        creatorId: 'creator-1',
+        status: '出題中',
       };
 
       render(<ActiveGameCard game={game} />);
 
-      const link = screen.getByRole('link');
-      expect(link).toBeInTheDocument();
-      expect(link).toHaveAttribute('href', '/games/game-nav-001/answer');
+      const answerLink = screen.getByRole('link', { name: '回答する' });
+      expect(answerLink).toBeInTheDocument();
+      expect(answerLink).toHaveAttribute('href', '/games/game-nav-001/answer');
     });
 
     it('should navigate to correct game detail page for different IDs', () => {
@@ -206,10 +227,114 @@ describe('ActiveGameCard', () => {
           playerCount: 3,
           playerLimit: 8,
           formattedCreatedAt: '5分前',
+          creatorId: 'creator-1',
+          status: '出題中',
         };
 
         const { unmount } = render(<ActiveGameCard game={game} />);
-        const link = screen.getByRole('link');
+        const answerLink = screen.getByRole('link', { name: '回答する' });
+        expect(answerLink).toHaveAttribute('href', expectedHref);
+        unmount();
+      });
+    });
+  });
+
+  // T030: Test for conditional dashboard/results link
+  describe('conditional dashboard/results navigation', () => {
+    it('should link to dashboard for active games (出題中)', () => {
+      const game: ActiveGameListItem = {
+        id: 'game-conditional-001',
+        title: '出題中のゲーム',
+        createdAt: '2025-11-18T10:00:00Z',
+        playerCount: 5,
+        playerLimit: 10,
+        formattedCreatedAt: '10分前',
+        creatorId: 'creator-1',
+        status: '出題中',
+      };
+
+      render(<ActiveGameCard game={game} />);
+
+      const dashboardLink = screen.getByRole('link', { name: 'ダッシュボード' });
+      expect(dashboardLink).toBeInTheDocument();
+      expect(dashboardLink).toHaveAttribute('href', '/games/game-conditional-001/dashboard');
+    });
+
+    it('should link to results for closed games (締切)', () => {
+      const game: ActiveGameListItem = {
+        id: 'game-conditional-002',
+        title: '締切のゲーム',
+        createdAt: '2025-11-18T10:00:00Z',
+        playerCount: 8,
+        playerLimit: 10,
+        formattedCreatedAt: '30分前',
+        creatorId: 'creator-1',
+        status: '締切',
+      };
+
+      render(<ActiveGameCard game={game} />);
+
+      const resultsLink = screen.getByRole('link', { name: '結果を見る' });
+      expect(resultsLink).toBeInTheDocument();
+      expect(resultsLink).toHaveAttribute('href', '/games/game-conditional-002/results');
+    });
+
+    it('should display correct button text based on game status', () => {
+      const activeGame: ActiveGameListItem = {
+        id: 'game-text-001',
+        title: 'アクティブゲーム',
+        createdAt: '2025-11-18T10:00:00Z',
+        playerCount: 3,
+        playerLimit: 8,
+        formattedCreatedAt: '5分前',
+        creatorId: 'creator-1',
+        status: '出題中',
+      };
+
+      const { unmount } = render(<ActiveGameCard game={activeGame} />);
+      expect(screen.getByText('ダッシュボード')).toBeInTheDocument();
+      unmount();
+
+      const closedGame: ActiveGameListItem = {
+        ...activeGame,
+        id: 'game-text-002',
+        status: '締切',
+      };
+
+      render(<ActiveGameCard game={closedGame} />);
+      expect(screen.getByText('結果を見る')).toBeInTheDocument();
+    });
+
+    it('should maintain correct link behavior across multiple game states', () => {
+      const testCases = [
+        {
+          id: 'multi-001',
+          status: '出題中' as const,
+          expectedText: 'ダッシュボード',
+          expectedHref: '/games/multi-001/dashboard',
+        },
+        {
+          id: 'multi-002',
+          status: '締切' as const,
+          expectedText: '結果を見る',
+          expectedHref: '/games/multi-002/results',
+        },
+      ];
+
+      testCases.forEach(({ id, status, expectedText, expectedHref }) => {
+        const game: ActiveGameListItem = {
+          id,
+          title: `テストゲーム ${status}`,
+          createdAt: '2025-11-18T10:00:00Z',
+          playerCount: 4,
+          playerLimit: 10,
+          formattedCreatedAt: '10分前',
+          creatorId: 'creator-1',
+          status,
+        };
+
+        const { unmount } = render(<ActiveGameCard game={game} />);
+        const link = screen.getByRole('link', { name: expectedText });
         expect(link).toHaveAttribute('href', expectedHref);
         unmount();
       });
@@ -226,16 +351,18 @@ describe('ActiveGameCard', () => {
         playerCount: 2,
         playerLimit: 5,
         formattedCreatedAt: '15分前',
+        creatorId: 'creator-1',
+        status: '出題中',
       };
 
       render(<ActiveGameCard game={game} />);
 
-      const link = screen.getByRole('link');
+      const answerLink = screen.getByRole('link', { name: '回答する' });
       // Should have transition and hover classes
-      expect(link.className).toMatch(/transition/);
+      expect(answerLink.className).toMatch(/transition/);
     });
 
-    it('should have proper accessibility attributes', () => {
+    it('should have proper accessibility attributes for active games', () => {
       const game: ActiveGameListItem = {
         id: 'game-a11y-001',
         title: 'アクセシビリティテスト',
@@ -243,12 +370,41 @@ describe('ActiveGameCard', () => {
         playerCount: 7,
         playerLimit: 10,
         formattedCreatedAt: '20分前',
+        creatorId: 'creator-1',
+        status: '出題中',
       };
 
       render(<ActiveGameCard game={game} />);
 
-      const link = screen.getByRole('link');
-      expect(link).toHaveAccessibleName('アクセシビリティテスト の回答ページへ移動');
+      const answerLink = screen.getByRole('link', { name: '回答する' });
+      expect(answerLink).toBeInTheDocument();
+
+      const dashboardLink = screen.getByRole('link', { name: 'ダッシュボード' });
+      expect(dashboardLink).toBeInTheDocument();
+    });
+
+    it('should have proper accessibility attributes for closed games', () => {
+      const game: ActiveGameListItem = {
+        id: 'game-a11y-002',
+        title: 'アクセシビリティテスト（締切）',
+        createdAt: '2025-11-18T10:00:00Z',
+        playerCount: 7,
+        playerLimit: 10,
+        formattedCreatedAt: '20分前',
+        creatorId: 'creator-1',
+        status: '締切',
+      };
+
+      render(<ActiveGameCard game={game} />);
+
+      const disabledAnswerButton = screen.getByRole('button', {
+        name: 'このゲームは締め切られました',
+      });
+      expect(disabledAnswerButton).toBeInTheDocument();
+      expect(disabledAnswerButton).toBeDisabled();
+
+      const resultsLink = screen.getByRole('link', { name: '結果を見る' });
+      expect(resultsLink).toBeInTheDocument();
     });
 
     it('should have focus-visible styling for keyboard navigation', () => {
@@ -259,13 +415,15 @@ describe('ActiveGameCard', () => {
         playerCount: 4,
         playerLimit: 8,
         formattedCreatedAt: '10分前',
+        creatorId: 'creator-1',
+        status: '出題中',
       };
 
       render(<ActiveGameCard game={game} />);
 
-      const link = screen.getByRole('link');
+      const answerLink = screen.getByRole('link', { name: '回答する' });
       // Should have focus-visible classes for keyboard navigation
-      expect(link.className).toMatch(/focus/);
+      expect(answerLink.className).toMatch(/focus/);
     });
   });
 });

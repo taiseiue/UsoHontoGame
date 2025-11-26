@@ -1,6 +1,6 @@
 // E2E Test: Results Dashboard
 // Feature: 006-results-dashboard
-// Tests the complete results dashboard flow (response status, scoreboard, results)
+// Tests the complete results dashboard flow (response status and results)
 
 import { expect, test } from '@playwright/test';
 
@@ -38,49 +38,6 @@ test.describe('Results Dashboard - Moderator Flow', () => {
     // Then: Should display counts
     await expect(page.locator('text=/全/')).toBeVisible();
     await expect(page.locator('text=/人中/')).toBeVisible();
-  });
-
-  test('should navigate to scoreboard after closing game', async ({ page }) => {
-    // Given: A game in 締切 status
-    const closedGameId = '550e8400-e29b-41d4-a716-446655440004';
-
-    // When: Navigate to scoreboard
-    await page.goto(`/games/${closedGameId}/scoreboard`);
-
-    // Then: Should show scoreboard
-    await expect(page.locator('h1')).toContainText('スコアボード');
-
-    // Should show participant scores
-    await expect(page.locator('text=/得点/')).toBeVisible();
-    await expect(page.locator('text=/点/')).toBeVisible();
-  });
-
-  test('should display scores sorted by total points', async ({ page }) => {
-    // Given: A game with multiple participants
-    const closedGameId = '550e8400-e29b-41d4-a716-446655440004';
-
-    // When: View scoreboard
-    await page.goto(`/games/${closedGameId}/scoreboard`);
-
-    // Then: Scores should be sorted (highest first)
-    // Note: Actual score values will depend on test data
-    await expect(page.locator('text=/得点/')).toBeVisible();
-  });
-
-  test('should navigate to results page from scoreboard', async ({ page }) => {
-    // Given: On scoreboard page
-    const closedGameId = '550e8400-e29b-41d4-a716-446655440004';
-    await page.goto(`/games/${closedGameId}/scoreboard`);
-
-    // When: Click results link
-    const resultsLink = page.locator('a[href*="/results"]');
-    if (await resultsLink.isVisible()) {
-      await resultsLink.click();
-      await page.waitForURL(`/games/${closedGameId}/results`);
-
-      // Then: Should show results page
-      await expect(page.locator('h1')).toContainText('結果発表');
-    }
   });
 
   test('should show winner celebration on results page', async ({ page }) => {
@@ -220,39 +177,16 @@ test.describe('Results Dashboard - Integration Tests', () => {
     await page.click('button[type="submit"]');
     await page.waitForURL('/top');
 
-    // When: Navigate through dashboard → scoreboard → results
+    // When: Navigate through dashboard → results
     const gameId = '550e8400-e29b-41d4-a716-446655440003';
 
     // Step 1: View dashboard (if game is 出題中)
     await page.goto(`/games/${gameId}/dashboard`);
     await expect(page.locator('h1')).toContainText('回答状況');
 
-    // Step 2: After game closes, view scoreboard
+    // Step 2: View results after game closes
     const closedGameId = '550e8400-e29b-41d4-a716-446655440004';
-    await page.goto(`/games/${closedGameId}/scoreboard`);
-    await expect(page.locator('h1')).toContainText('スコアボード');
-
-    // Step 3: View results
     await page.goto(`/games/${closedGameId}/results`);
     await expect(page.locator('h1')).toContainText('結果発表');
-  });
-
-  test('should show correct score calculations', async ({ page }) => {
-    // Given: A closed game with known answers
-    await page.goto('/');
-    await page.fill('input[name="nickname"]', 'ScoreTestUser');
-    await page.click('button[type="submit"]');
-    await page.waitForURL('/top');
-
-    const closedGameId = '550e8400-e29b-41d4-a716-446655440004';
-
-    // When: View scoreboard
-    await page.goto(`/games/${closedGameId}/scoreboard`);
-
-    // Then: Scores should be calculated (10 points per correct answer)
-    await expect(page.locator('text=/点/')).toBeVisible();
-
-    // Note: Actual score values depend on test data
-    // This test verifies the scoring UI is functional
   });
 });

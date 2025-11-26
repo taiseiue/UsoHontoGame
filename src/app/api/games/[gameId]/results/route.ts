@@ -2,23 +2,23 @@
 // Feature: 006-results-dashboard, User Story 3
 // Returns final rankings with winner highlighting
 
-import { NextResponse, type NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { GetResults } from '@/server/application/use-cases/results/GetResults';
-import { createGameRepository, createAnswerRepository } from '@/server/infrastructure/repositories';
 import { SessionServiceContainer } from '@/server/infrastructure/di/SessionServiceContainer';
+import { createAnswerRepository, createGameRepository } from '@/server/infrastructure/repositories';
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ gameId: string }> }
 ) {
   try {
     const { gameId } = await params;
 
     // Validate session
-    let sessionId: string;
+    let _sessionId: string;
     try {
       const sessionService = SessionServiceContainer.getSessionService();
-      sessionId = await sessionService.requireCurrentSession();
+      _sessionId = await sessionService.requireCurrentSession();
     } catch {
       return NextResponse.json(
         { error: 'Unauthorized', details: 'Session required' },

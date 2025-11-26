@@ -7,8 +7,6 @@
 
 * **回答状況表示機能 (司会者):**
   * 各Playerが投票済みか否かを確認できる。
-  * 各Playerが投票済みの場合、スコアボードで各プレイヤーの点数を確認できる。
-    * 同時に、各回答チームがどの番号に投票したかを一覧で表示する。
 * **ポイント自動計算機能 (システム):**
     * 提示されたルールに基づき、ポイントを即座に自動計算する。
         * 正解した場合、当該チームに +10ポイント。
@@ -35,29 +33,11 @@ As a game moderator, I need to monitor which participants have submitted their a
 
 ---
 
-### User Story 2 - Score Calculation and Display (Priority: P2)
-
-As a game moderator, I need to see automatically calculated scores for each participant after the answer phase closes so that I can quickly understand game results without manual calculations.
-
-**Why this priority**: After confirming all responses are in, the next critical need is to see results. Automatic calculation saves time and prevents errors, but requires the answer collection (P1) to be complete first.
-
-**Independent Test**: Can be tested by closing an answer phase with known correct/incorrect responses and verifying scores are calculated correctly (10 points for correct answers, 0 for incorrect). Can also verify that answer selections are displayed alongside scores. Delivers value by eliminating manual score calculation.
-
-**Acceptance Scenarios**:
-
-1. **Given** game is closed with all participants having submitted answers, **When** moderator views scoreboard, **Then** system displays each participant's name, total score, and their episode selections
-2. **Given** participant correctly identified the lie episode, **When** score is calculated, **Then** participant receives 10 points for that presenter
-3. **Given** participant incorrectly identified an episode, **When** score is calculated, **Then** participant receives 0 points for that presenter
-4. **Given** game has multiple presenters, **When** scores are displayed, **Then** participant's total score is the sum of points from all presenters
-5. **Given** scoreboard is displayed, **When** moderator views answer details, **Then** system shows which episode each participant selected for each presenter
-
----
-
-### User Story 3 - Final Results and Winner Celebration (Priority: P3)
+### User Story 2 - Final Results and Winner Celebration (Priority: P2)
 
 As a participant or moderator, I want to see the final rankings with the winning team highlighted and celebrated so that the game concludes with a satisfying conclusion and clear winner announcement.
 
-**Why this priority**: This enhances game experience but isn't critical for core gameplay. The game is functional with just scores (P2), but the celebration makes it more engaging. This is a polish feature that can be added after core functionality works.
+**Why this priority**: After confirming all responses are in, the next critical need is to see results with winner celebration. This enhances game experience and provides a satisfying conclusion.
 
 **Independent Test**: Can be tested by completing a game and verifying the results page shows rankings in order, highlights the winner distinctly, and displays celebratory effects. Delivers value through improved user experience and game conclusion satisfaction.
 
@@ -89,8 +69,6 @@ As a participant or moderator, I want to see the final rankings with the winning
 - **FR-004**: System MUST award 10 points to participants for each correct lie identification
 - **FR-005**: System MUST award 0 points to participants for incorrect episode selections
 - **FR-006**: System MUST sum scores across all presenters to calculate each participant's total score
-- **FR-007**: System MUST display scoreboard showing participant names, total scores, and episode selections
-- **FR-008**: System MUST show which episode each participant selected for each presenter
 - **FR-009**: System MUST rank participants by total score from highest to lowest on results page
 - **FR-010**: System MUST visually highlight the winning participant(s) on results page
 - **FR-011**: System MUST display congratulations message for the winner
@@ -103,7 +81,6 @@ As a participant or moderator, I want to see the final rankings with the winning
 ### Key Entities
 
 - **Response Status**: Tracks which participants have submitted answers (participant ID, submission timestamp, completion status)
-- **Score**: Represents calculated points for a participant (participant ID, presenter ID, points earned, episode selected, is correct)
 - **Ranking**: Final standings showing participant positions (rank position, participant ID, total score, tie status)
 
 ## Success Criteria *(mandatory)*
@@ -111,7 +88,6 @@ As a participant or moderator, I want to see the final rankings with the winning
 ### Measurable Outcomes
 
 - **SC-001**: Moderators can view response status and know when all participants have submitted within 2 seconds of page load
-- **SC-002**: Scores are calculated and displayed within 3 seconds of game closing
 - **SC-003**: Results page loads and displays complete rankings for games with up to 50 participants in under 3 seconds
 - **SC-004**: 95% of users can understand their ranking and score without additional explanation
 - **SC-005**: Winner celebration effects display immediately when results page loads (within 1 second)
@@ -123,7 +99,6 @@ As a participant or moderator, I want to see the final rankings with the winning
 
 - Real-time response status tracking for moderators
 - Automatic score calculation based on correct/incorrect answers
-- Scoreboard display with participant names, scores, and selections
 - Final rankings display with winner highlighting
 - Celebratory effects for winner announcement
 - Results page accessible to all participants

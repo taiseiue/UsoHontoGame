@@ -66,7 +66,7 @@ export function useGameValidation({
         setError(validationError);
         onError?.(validationError);
       }
-    } catch (err) {
+    } catch (_err) {
       const unknownError = {
         code: 'UNKNOWN_ERROR',
         message: '予期しないエラーが発生しました',

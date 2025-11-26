@@ -38,7 +38,7 @@ export default function WinnerCelebration({ winners, isActive }: WinnerCelebrati
 
           {/* Winner Names */}
           <div className="mb-4 space-y-2">
-            {winners.map((winner, index) => (
+            {winners.map((winner, _index) => (
               <div key={winner.nickname} className="rounded-lg bg-white/80 px-6 py-3 shadow-md">
                 <p className="text-2xl font-bold text-gray-900">{winner.nickname}</p>
                 <p className="text-lg text-yellow-700">{winner.score} 点</p>

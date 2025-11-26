@@ -4,10 +4,10 @@
  * Tests wrapper hook that handles data fetching and coordinates with useAnswerSubmission
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
-import { useAnswerSubmissionPage } from './useAnswerSubmissionPage';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PresenterWithLieDto } from '@/server/application/dto/PresenterWithLieDto';
+import { useAnswerSubmissionPage } from './useAnswerSubmissionPage';
 
 // Mock dependencies
 vi.mock('next/navigation', () => ({

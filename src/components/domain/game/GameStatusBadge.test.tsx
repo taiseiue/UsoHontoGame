@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AccessibilityProvider } from '@/components/ui/AccessibilityProvider';
 import { GameStatusBadge, GameStatusBadgeLarge } from './GameStatusBadge';
@@ -6,7 +6,7 @@ import { GameStatusBadge, GameStatusBadgeLarge } from './GameStatusBadge';
 // Mock animation sequences
 vi.mock('@/lib/animations', () => ({
   animationSequences: {
-    statusBadgeUpdate: vi.fn((element, callback) => {
+    statusBadgeUpdate: vi.fn((_element, callback) => {
       callback();
       return Promise.resolve();
     }),

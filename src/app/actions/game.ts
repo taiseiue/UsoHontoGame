@@ -4,8 +4,8 @@
 // Feature: 002-game-preparation
 // Server Actions with Zod validation for game management
 
-import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import type { GameDetailDto } from '@/server/application/dto/GameDetailDto';
 import type { CreateGameOutput, GameManagementDto } from '@/server/application/dto/GameDto';
 import { CloseGame } from '@/server/application/use-cases/games/CloseGame';

@@ -1,12 +1,12 @@
 // Use Case Tests: GetGameForAnswers
 // Test-Driven Development: Write FAILING tests first
 
-import { describe, expect, it, beforeEach } from 'vitest';
-import { GetGameForAnswers } from './GetGameForAnswers';
-import type { IGameRepository } from '@/server/domain/repositories/IGameRepository';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { Game } from '@/server/domain/entities/Game';
+import type { IGameRepository } from '@/server/domain/repositories/IGameRepository';
 import { GameId } from '@/server/domain/value-objects/GameId';
 import { GameStatus } from '@/server/domain/value-objects/GameStatus';
+import { GetGameForAnswers } from './GetGameForAnswers';
 
 describe('GetGameForAnswers Use Case', () => {
   let gameRepository: IGameRepository;

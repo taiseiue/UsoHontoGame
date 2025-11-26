@@ -65,7 +65,7 @@ export function useCloseGame({
         setError(errorMessage);
         onError?.(errorMessage);
       }
-    } catch (err) {
+    } catch (_err) {
       // Unexpected error (network, etc.)
       const errorMessage = 'ゲームの締切に失敗しました';
       setError(errorMessage);

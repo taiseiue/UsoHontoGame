@@ -4,9 +4,9 @@
 
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
-import { TopPageWithData } from './TopPageWithData';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import type { ActiveGameListItem } from '@/types/game';
+import { TopPageWithData } from './TopPageWithData';
 
 // Mock the useActiveGames hook
 vi.mock('./hooks/useActiveGames', () => ({
@@ -34,9 +34,9 @@ vi.mock('@/components/ui/EmptyState', () => ({
   )),
 }));
 
+import { EmptyState } from '@/components/ui/EmptyState';
 import { useActiveGames } from './hooks/useActiveGames';
 import { TopPage } from './index';
-import { EmptyState } from '@/components/ui/EmptyState';
 
 const mockUseActiveGames = useActiveGames as Mock;
 const mockTopPage = TopPage as Mock;

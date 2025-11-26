@@ -2,7 +2,7 @@
 // Feature: 007-game-closure
 // Tests for the CloseGameButton component
 
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AccessibilityProvider } from '@/components/ui/AccessibilityProvider';
 import { CloseGameButton } from './CloseGameButton';

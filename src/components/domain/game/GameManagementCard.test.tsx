@@ -4,9 +4,9 @@
 
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
-import { GameManagementCard } from './GameManagementCard';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import type { GameManagementDto } from '@/server/application/dto/GameDto';
+import { GameManagementCard } from './GameManagementCard';
 
 // Mock server actions
 vi.mock('@/app/actions/game', () => ({
@@ -23,7 +23,7 @@ vi.mock('@/components/ui/Badge', () => ({
   ),
 }));
 
-import { startAcceptingAction, closeGameAction } from '@/app/actions/game';
+import { closeGameAction, startAcceptingAction } from '@/app/actions/game';
 
 const mockStartAcceptingAction = startAcceptingAction as Mock;
 const mockCloseGameAction = closeGameAction as Mock;

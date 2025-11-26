@@ -21,7 +21,7 @@ import { expect, test } from '@playwright/test';
  */
 
 test.describe('Answer Submission - Participant Journey', () => {
-  let gameId: string;
+  let _gameId: string;
   let nickname: string;
 
   test.beforeEach(async ({ page, context }) => {

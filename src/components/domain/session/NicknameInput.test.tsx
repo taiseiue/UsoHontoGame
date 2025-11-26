@@ -2,8 +2,8 @@
 // Feature: 001-session-top-page
 // Tests for nickname input form with validation and submission
 
-import { render, screen, fireEvent } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { NicknameInput } from './NicknameInput';
 
 // Mock the useNicknameForm hook
@@ -49,9 +49,9 @@ vi.mock('@/components/ui/Button', () => ({
   )),
 }));
 
-import { useNicknameForm } from './hooks/useNicknameForm';
-import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { useNicknameForm } from './hooks/useNicknameForm';
 
 const mockUseNicknameForm = useNicknameForm as Mock;
 const mockInput = Input as Mock;

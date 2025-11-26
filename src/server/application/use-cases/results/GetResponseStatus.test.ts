@@ -2,11 +2,11 @@
 // Feature: 006-results-dashboard, User Story 1
 // TDD: Write tests FIRST, ensure they FAIL before implementation
 
-import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
-import type { GameEntity } from '@/server/domain/entities/Game';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AnswerEntity } from '@/server/domain/entities/Answer';
-import type { IGameRepository } from '@/server/domain/repositories/IGameRepository';
+import type { GameEntity } from '@/server/domain/entities/Game';
 import type { IAnswerRepository } from '@/server/domain/repositories/IAnswerRepository';
+import type { IGameRepository } from '@/server/domain/repositories/IGameRepository';
 
 // Mock repositories
 const mockGameRepository: IGameRepository = {
@@ -36,7 +36,7 @@ describe('GetResponseStatus Use Case', () => {
   describe('execute', () => {
     it('should return response status for game in 出題中 status', async () => {
       // Arrange
-      const gameId = 'game-123';
+      const _gameId = 'game-123';
       const mockGame: Partial<GameEntity> = {
         id: 'game-123',
         name: 'Test Game',
@@ -80,7 +80,7 @@ describe('GetResponseStatus Use Case', () => {
 
     it('should set allSubmitted to true when all participants submitted', async () => {
       // Arrange
-      const gameId = 'game-123';
+      const _gameId = 'game-123';
       const mockGame: Partial<GameEntity> = {
         id: 'game-123',
         name: 'Test Game',
@@ -109,7 +109,7 @@ describe('GetResponseStatus Use Case', () => {
 
     it('should return error when game not found', async () => {
       // Arrange
-      const gameId = 'nonexistent';
+      const _gameId = 'nonexistent';
       vi.mocked(mockGameRepository.findById).mockResolvedValue(null);
 
       // Act & Assert
@@ -125,7 +125,7 @@ describe('GetResponseStatus Use Case', () => {
 
     it('should return error when game status is not 出題中 or 締切', async () => {
       // Arrange
-      const gameId = 'game-123';
+      const _gameId = 'game-123';
       const mockGame: Partial<GameEntity> = {
         id: 'game-123',
         name: 'Test Game',
@@ -148,7 +148,7 @@ describe('GetResponseStatus Use Case', () => {
 
     it('should sort participants alphabetically by nickname', async () => {
       // Arrange
-      const gameId = 'game-123';
+      const _gameId = 'game-123';
       const mockGame: Partial<GameEntity> = {
         id: 'game-123',
         name: 'Test Game',
@@ -182,7 +182,7 @@ describe('GetResponseStatus Use Case', () => {
     // Tests for closed game status
     it('should return response status for closed game (締切)', async () => {
       // Arrange
-      const gameId = 'game-123';
+      const _gameId = 'game-123';
       const mockGame: Partial<GameEntity> = {
         id: 'game-123',
         name: 'Closed Game',
@@ -226,7 +226,7 @@ describe('GetResponseStatus Use Case', () => {
 
     it('should set shouldContinuePolling to false when game is closed', async () => {
       // Arrange
-      const gameId = 'game-123';
+      const _gameId = 'game-123';
       const mockGame: Partial<GameEntity> = {
         id: 'game-123',
         name: 'Closed Game',
@@ -256,7 +256,7 @@ describe('GetResponseStatus Use Case', () => {
 
     it('should set shouldContinuePolling to true when game is 出題中', async () => {
       // Arrange
-      const gameId = 'game-123';
+      const _gameId = 'game-123';
       const mockGame: Partial<GameEntity> = {
         id: 'game-123',
         name: 'Active Game',

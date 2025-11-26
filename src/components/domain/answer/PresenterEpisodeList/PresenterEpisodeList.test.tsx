@@ -3,8 +3,8 @@
 // Task: T036
 
 import { render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AccessibilityProvider } from '@/components/ui/AccessibilityProvider';
 import { PresenterEpisodeList } from './index';
 

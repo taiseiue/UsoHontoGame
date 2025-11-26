@@ -4,7 +4,7 @@
 
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ToastProvider, statusTransitionToasts, useGlobalToast, useToast } from './useToast';
+import { statusTransitionToasts, ToastProvider, useGlobalToast, useToast } from './useToast';
 
 describe('useToast', () => {
   let dateNowMock: ReturnType<typeof vi.spyOn>;

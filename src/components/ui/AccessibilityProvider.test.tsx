@@ -1,15 +1,14 @@
 // Component Tests: AccessibilityProvider
 // UI Primitive component for screen reader announcements
 
-import { render, screen, renderHook } from '@testing-library/react';
-import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
+import { render, renderHook, screen } from '@testing-library/react';
+import { act, type ReactNode } from 'react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   AccessibilityProvider,
   useAccessibility,
   useConditionalAnnouncement,
 } from './AccessibilityProvider';
-import { type ReactNode } from 'react';
-import { act } from 'react';
 
 describe('AccessibilityProvider', () => {
   beforeEach(() => {

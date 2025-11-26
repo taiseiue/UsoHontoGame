@@ -2,13 +2,13 @@
 // Test-Driven Development: Write FAILING tests first
 // Task: T041
 
-import { render, screen, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AccessibilityProvider } from '@/components/ui/AccessibilityProvider';
-import { AnswerSubmissionPage } from './index';
 import type { GameAnswerFormData } from './hooks/useAnswerSubmission';
 import { useAnswerSubmissionPage } from './hooks/useAnswerSubmissionPage';
+import { AnswerSubmissionPage } from './index';
 
 // Mock dependencies
 vi.mock('@/components/domain/answer/GameAnswerForm', () => ({

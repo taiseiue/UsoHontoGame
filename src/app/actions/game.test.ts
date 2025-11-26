@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { IGameRepository } from '@/server/domain/repositories/IGameRepository';
+import type { ISessionService } from '@/server/domain/repositories/ISessionService';
 import { closeGameAction, startGameAction } from './game';
 
 // Create mock instances that will be reused
@@ -16,19 +18,23 @@ const mockCloseGame = {
 
 // Mock the use case classes with proper constructors
 vi.mock('@/server/application/use-cases/games/ValidateStatusTransition', () => ({
-  ValidateStatusTransition: vi.fn().mockImplementation(function (this: any) {
+  ValidateStatusTransition: vi.fn().mockImplementation(function (this: {
+    execute: typeof mockValidateStatusTransition.execute;
+  }) {
     Object.assign(this, mockValidateStatusTransition);
   }),
 }));
 
 vi.mock('@/server/application/use-cases/games/StartAcceptingResponses', () => ({
-  StartAcceptingResponses: vi.fn().mockImplementation(function (this: any) {
+  StartAcceptingResponses: vi.fn().mockImplementation(function (this: {
+    execute: typeof mockStartAcceptingResponses.execute;
+  }) {
     Object.assign(this, mockStartAcceptingResponses);
   }),
 }));
 
 vi.mock('@/server/application/use-cases/games/CloseGame', () => ({
-  CloseGame: vi.fn().mockImplementation(function (this: any) {
+  CloseGame: vi.fn().mockImplementation(function (this: { execute: typeof mockCloseGame.execute }) {
     Object.assign(this, mockCloseGame);
   }),
 }));
@@ -51,8 +57,8 @@ vi.mock('next/cache', () => ({
 }));
 
 describe('Status Transition Server Actions', () => {
-  let mockRepository: any;
-  let mockSessionService: any;
+  let mockRepository: IGameRepository;
+  let mockSessionService: ISessionService;
 
   beforeEach(async () => {
     mockRepository = {

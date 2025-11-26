@@ -1,12 +1,12 @@
 // Use Case: SubmitAnswer
 // Handles answer submission with validation, participation tracking, and upsert
 
-import type { IAnswerRepository } from '@/server/domain/repositories/IAnswerRepository';
-import type { IParticipationRepository } from '@/server/domain/repositories/IParticipationRepository';
-import type { IGameRepository } from '@/server/domain/repositories/IGameRepository';
 import type { SubmitAnswerRequest } from '@/server/application/dto/requests/SubmitAnswerRequest';
 import { AnswerEntity } from '@/server/domain/entities/Answer';
 import { ParticipationEntity } from '@/server/domain/entities/Participation';
+import type { IAnswerRepository } from '@/server/domain/repositories/IAnswerRepository';
+import type { IGameRepository } from '@/server/domain/repositories/IGameRepository';
+import type { IParticipationRepository } from '@/server/domain/repositories/IParticipationRepository';
 import { GameId } from '@/server/domain/value-objects/GameId';
 
 export interface SubmitAnswerSuccess {

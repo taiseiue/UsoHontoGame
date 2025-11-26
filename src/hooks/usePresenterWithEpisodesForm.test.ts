@@ -2,8 +2,8 @@
 // Feature: 003-presenter-episode-inline
 // Tests for complex form state management with 3 episodes and exclusive lie marker
 
-import { renderHook, act, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
+import { act, renderHook } from '@testing-library/react';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { usePresenterWithEpisodesForm } from './usePresenterWithEpisodesForm';
 
 // Mock the server action

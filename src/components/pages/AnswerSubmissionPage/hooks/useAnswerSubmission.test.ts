@@ -2,8 +2,8 @@
 // Test-Driven Development: Write FAILING tests first
 // Task: T031
 
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useAnswerSubmission } from './useAnswerSubmission';
 
 // Mock server action

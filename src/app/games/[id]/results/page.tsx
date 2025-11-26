@@ -3,10 +3,10 @@
 // Displays final rankings with winner celebration
 
 import { redirect } from 'next/navigation';
-import { SessionServiceContainer } from '@/server/infrastructure/di/SessionServiceContainer';
-import { GetResults } from '@/server/application/use-cases/results/GetResults';
-import { createGameRepository, createAnswerRepository } from '@/server/infrastructure/repositories';
 import { ResultsPage } from '@/components/pages/ResultsPage';
+import { GetResults } from '@/server/application/use-cases/results/GetResults';
+import { SessionServiceContainer } from '@/server/infrastructure/di/SessionServiceContainer';
+import { createAnswerRepository, createGameRepository } from '@/server/infrastructure/repositories';
 
 interface PageProps {
   params: Promise<{ id: string }>;

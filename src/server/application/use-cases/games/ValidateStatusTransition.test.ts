@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, type MockedFunction, vi } from 'vitest';
 import type { Game } from '../../../domain/entities/Game';
 import { StatusTransitionError } from '../../../domain/errors/StatusTransitionError';
-import type { IGameRepository } from '../../../domain/repositories/IGameRepository';
 import { GameStatus } from '../../../domain/value-objects/GameStatus';
 import { ValidateStatusTransition } from './ValidateStatusTransition';
 

@@ -7,8 +7,8 @@
 'use client';
 
 import type { FC, FormEvent } from 'react';
-import { PresenterEpisodeList } from '../PresenterEpisodeList';
 import type { Presenter } from '../PresenterEpisodeList';
+import { PresenterEpisodeList } from '../PresenterEpisodeList';
 
 export interface GameAnswerFormProps {
   presenters: Presenter[];
@@ -42,7 +42,7 @@ export const GameAnswerForm: FC<GameAnswerFormProps> = ({
   };
 
   return (
-    <form role="form" aria-label="回答フォーム" onSubmit={handleSubmit} className="space-y-6">
+    <form aria-label="回答フォーム" onSubmit={handleSubmit} className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">嘘を見抜いて回答しよう</h2>
         <p className="text-gray-600">各出題者のエピソードから嘘だと思うものを1つ選んでください</p>
@@ -60,12 +60,9 @@ export const GameAnswerForm: FC<GameAnswerFormProps> = ({
 
       {/* Success Message */}
       {successMessage && (
-        <div
-          role="status"
-          className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg"
-        >
+        <output className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg block">
           {successMessage}
-        </div>
+        </output>
       )}
 
       {/* Presenter Episode List */}
@@ -85,7 +82,8 @@ export const GameAnswerForm: FC<GameAnswerFormProps> = ({
 
       {isComplete && !isSubmitting && (
         <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center">
-          <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+            <title>チェックマーク</title>
             <path
               fillRule="evenodd"
               d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"

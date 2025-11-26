@@ -4,9 +4,9 @@
  * Tests filtering and ordering of active games
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { GetActiveGames } from './GetActiveGames';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { IGameRepository } from '@/server/domain/repositories/IGameRepository';
+import { GetActiveGames } from './GetActiveGames';
 
 describe('GetActiveGames', () => {
   let mockRepository: IGameRepository;

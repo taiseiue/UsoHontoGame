@@ -5,10 +5,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AccessibilityProvider } from '@/components/ui/AccessibilityProvider';
-import WinnerCelebration from '@/components/domain/results/WinnerCelebration';
 import RankingDisplay from '@/components/domain/results/RankingDisplay';
-import type { ResultsPageProps, ResultsPageData } from './ResultsPage.types';
+import WinnerCelebration from '@/components/domain/results/WinnerCelebration';
+import { AccessibilityProvider } from '@/components/ui/AccessibilityProvider';
+import type { ResultsPageData, ResultsPageProps } from './ResultsPage.types';
 
 export function ResultsPage({ gameId, initialData }: ResultsPageProps) {
   const [data, setData] = useState<ResultsPageData | null>(initialData || null);
@@ -58,10 +58,10 @@ export function ResultsPage({ gameId, initialData }: ResultsPageProps) {
         {/* Header */}
         <div className="mb-6">
           <a
-            href={`/games/${gameId}`}
+            href="/"
             className="mb-4 inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900"
           >
-            ← ゲーム詳細に戻る
+            ← TOPページに戻る
           </a>
           <h1 className="text-3xl font-bold text-gray-900">最終結果</h1>
           {data && (
@@ -107,18 +107,26 @@ export function ResultsPage({ gameId, initialData }: ResultsPageProps) {
             {/* Summary Statistics */}
             <div className="rounded-lg border border-gray-200 bg-gray-50 p-6">
               <h3 className="mb-3 text-lg font-semibold text-gray-900">統計情報</h3>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="text-center">
                   <p className="text-2xl font-bold text-blue-600">{data.totalParticipants}</p>
                   <p className="text-sm text-gray-600">参加者数</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600">{data.highestScore}</p>
+                  <p className="text-2xl font-bold text-green-600">{data.highestScore}点</p>
                   <p className="text-sm text-gray-600">最高得点</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-yellow-600">{winners.length}</p>
-                  <p className="text-sm text-gray-600">優勝者数</p>
+                  <p className="text-2xl font-bold text-purple-600">
+                    {data.averageScore.toFixed(1)}点
+                  </p>
+                  <p className="text-sm text-gray-600">平均得点</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-orange-600">
+                    {data.medianScore.toFixed(1)}点
+                  </p>
+                  <p className="text-sm text-gray-600">中央値</p>
                 </div>
               </div>
             </div>

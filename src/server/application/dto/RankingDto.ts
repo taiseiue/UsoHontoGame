@@ -7,6 +7,8 @@ export interface RankingDto {
   rankings: ParticipantRankingDto[];
   totalParticipants: number;
   highestScore: number;
+  averageScore: number;
+  medianScore: number;
   calculatedAt: Date;
 }
 

@@ -4,11 +4,11 @@
  * Tests for auto-refresh functionality with React Query
  */
 
-import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { describe, expect, it, vi, beforeEach, type Mock } from 'vitest';
-import { useActiveGames } from './useActiveGames';
+import { renderHook, waitFor } from '@testing-library/react';
 import { createElement, type ReactNode } from 'react';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { useActiveGames } from './useActiveGames';
 
 // Mock the server action
 vi.mock('@/app/actions/game', () => ({

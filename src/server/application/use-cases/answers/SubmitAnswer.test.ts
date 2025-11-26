@@ -1,15 +1,15 @@
 // Use Case Tests: SubmitAnswer
 // Test-Driven Development: Write FAILING tests first
 
-import { describe, expect, it, beforeEach, vi } from 'vitest';
-import { SubmitAnswer } from './SubmitAnswer';
-import type { IAnswerRepository } from '@/server/domain/repositories/IAnswerRepository';
-import type { IParticipationRepository } from '@/server/domain/repositories/IParticipationRepository';
-import type { IGameRepository } from '@/server/domain/repositories/IGameRepository';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { SubmitAnswerRequest } from '@/server/application/dto/requests/SubmitAnswerRequest';
 import { Game } from '@/server/domain/entities/Game';
+import type { IAnswerRepository } from '@/server/domain/repositories/IAnswerRepository';
+import type { IGameRepository } from '@/server/domain/repositories/IGameRepository';
+import type { IParticipationRepository } from '@/server/domain/repositories/IParticipationRepository';
 import { GameId } from '@/server/domain/value-objects/GameId';
 import { GameStatus } from '@/server/domain/value-objects/GameStatus';
-import type { SubmitAnswerRequest } from '@/server/application/dto/requests/SubmitAnswerRequest';
+import { SubmitAnswer } from './SubmitAnswer';
 
 describe('SubmitAnswer Use Case', () => {
   let answerRepository: IAnswerRepository;

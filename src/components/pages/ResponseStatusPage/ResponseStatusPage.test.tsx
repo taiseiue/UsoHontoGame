@@ -3,7 +3,6 @@
 // TDD: Write tests FIRST
 
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
 import type { ResponseStatusDto } from '@/server/application/dto/ResponseStatusDto';
 
 // Mock hook
@@ -15,7 +14,7 @@ vi.mock('./hooks/useResponseStatus', () => ({
 // import ResponseStatusPage from './index';
 
 describe('ResponseStatusPage', () => {
-  const mockData: ResponseStatusDto = {
+  const _mockData: ResponseStatusDto = {
     gameId: 'game-123',
     gameName: 'Test Game',
     gameStatus: '出題中',

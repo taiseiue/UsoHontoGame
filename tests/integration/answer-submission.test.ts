@@ -10,19 +10,18 @@
  */
 
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { nanoid } from 'nanoid';
-import { CreateGame } from '@/server/application/use-cases/games/CreateGame';
-import { AddPresenterWithEpisodes } from '@/server/application/use-cases/games/AddPresenterWithEpisodes';
-import { StartAcceptingResponses } from '@/server/application/use-cases/games/StartAcceptingResponses';
-import { SubmitAnswer } from '@/server/application/use-cases/answers/SubmitAnswer';
 import { GetGameForAnswers } from '@/server/application/use-cases/answers/GetGameForAnswers';
-import type { IGameRepository } from '@/server/domain/repositories/IGameRepository';
+import { SubmitAnswer } from '@/server/application/use-cases/answers/SubmitAnswer';
+import { AddPresenterWithEpisodes } from '@/server/application/use-cases/games/AddPresenterWithEpisodes';
+import { CreateGame } from '@/server/application/use-cases/games/CreateGame';
+import { StartAcceptingResponses } from '@/server/application/use-cases/games/StartAcceptingResponses';
 import type { IAnswerRepository } from '@/server/domain/repositories/IAnswerRepository';
+import type { IGameRepository } from '@/server/domain/repositories/IGameRepository';
 import type { IParticipationRepository } from '@/server/domain/repositories/IParticipationRepository';
-import { PrismaGameRepository } from '@/server/infrastructure/repositories/PrismaGameRepository';
-import { PrismaAnswerRepository } from '@/server/infrastructure/repositories/PrismaAnswerRepository';
-import { PrismaParticipationRepository } from '@/server/infrastructure/repositories/PrismaParticipationRepository';
 import { GameId } from '@/server/domain/value-objects/GameId';
+import { PrismaAnswerRepository } from '@/server/infrastructure/repositories/PrismaAnswerRepository';
+import { PrismaGameRepository } from '@/server/infrastructure/repositories/PrismaGameRepository';
+import { PrismaParticipationRepository } from '@/server/infrastructure/repositories/PrismaParticipationRepository';
 import { createTestDatabase, type TestDatabase } from '../utils/test-database';
 
 describe('Answer Submission Integration', () => {

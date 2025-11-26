@@ -110,7 +110,7 @@ export function useAnswerSubmission({
         setError(errorMessage);
         onError?.(errorMessage);
       }
-    } catch (err) {
+    } catch (_err) {
       const errorMessage = '予期しないエラーが発生しました';
       setError(errorMessage);
       onError?.(errorMessage);

@@ -6,17 +6,16 @@
 
 import type { GetGameForAnswersResponse } from '@/server/application/use-cases/answers/GetGameForAnswers';
 import { GetGameForAnswers } from '@/server/application/use-cases/answers/GetGameForAnswers';
-import type { SubmitAnswerResult } from '@/server/application/use-cases/answers/SubmitAnswer';
 import { SubmitAnswer } from '@/server/application/use-cases/answers/SubmitAnswer';
+import { ValidateSession } from '@/server/application/use-cases/session/ValidateSession';
 import { SubmitAnswerSchema } from '@/server/domain/schemas/answerSchemas';
 import { SessionServiceContainer } from '@/server/infrastructure/di/SessionServiceContainer';
-import { ValidateSession } from '@/server/application/use-cases/session/ValidateSession';
-import { CookieSessionRepository } from '@/server/infrastructure/repositories/CookieSessionRepository';
 import {
   createAnswerRepository,
   createGameRepository,
   createParticipationRepository,
 } from '@/server/infrastructure/repositories';
+import { CookieSessionRepository } from '@/server/infrastructure/repositories/CookieSessionRepository';
 
 // Create session repository instance for session validation
 const sessionRepository = new CookieSessionRepository();

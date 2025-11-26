@@ -2,12 +2,12 @@
 // Feature: 002-game-preparation, 001-lie-detection-answers
 // Provides repository instances using Prisma
 
-import type { IGameRepository } from '@/server/domain/repositories/IGameRepository';
 import type { IAnswerRepository } from '@/server/domain/repositories/IAnswerRepository';
+import type { IGameRepository } from '@/server/domain/repositories/IGameRepository';
 import type { IParticipationRepository } from '@/server/domain/repositories/IParticipationRepository';
 import { PrismaClient } from '../../../generated/prisma/client';
-import { PrismaGameRepository } from './PrismaGameRepository';
 import { PrismaAnswerRepository } from './PrismaAnswerRepository';
+import { PrismaGameRepository } from './PrismaGameRepository';
 import { PrismaParticipationRepository } from './PrismaParticipationRepository';
 
 /**
@@ -59,7 +59,7 @@ export async function closeRepositoryConnections(): Promise<void> {
   }
 }
 
+export { PrismaAnswerRepository } from './PrismaAnswerRepository';
 // Export repository implementations
 export { PrismaGameRepository } from './PrismaGameRepository';
-export { PrismaAnswerRepository } from './PrismaAnswerRepository';
 export { PrismaParticipationRepository } from './PrismaParticipationRepository';

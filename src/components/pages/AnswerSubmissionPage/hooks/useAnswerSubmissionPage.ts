@@ -6,11 +6,11 @@
 
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 import { getPresentersAction } from '@/app/actions/presenter';
-import { useAnswerSubmission, type Presenter } from './useAnswerSubmission';
 import type { PresenterWithLieDto } from '@/server/application/dto/PresenterWithLieDto';
+import { type Presenter, useAnswerSubmission } from './useAnswerSubmission';
 
 export interface UseAnswerSubmissionPageOptions {
   gameId: string;
@@ -79,7 +79,7 @@ export function useAnswerSubmissionPage({
         } else {
           setFetchError(result.error);
         }
-      } catch (err) {
+      } catch (_err) {
         if (!isMounted) return;
         setFetchError('プレゼンターの取得に失敗しました');
       } finally {

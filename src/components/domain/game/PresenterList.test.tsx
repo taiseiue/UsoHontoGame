@@ -4,9 +4,9 @@
 
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
-import { PresenterList } from './PresenterList';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import type { PresenterWithLieDto } from '@/server/application/dto/PresenterWithLieDto';
+import { PresenterList } from './PresenterList';
 
 // Mock server action
 vi.mock('@/app/actions/presenter', () => ({

@@ -4,9 +4,9 @@
 
 import { redirect } from 'next/navigation';
 import { ResponseStatusPage } from '@/components/pages/ResponseStatusPage';
-import { SessionServiceContainer } from '@/server/infrastructure/di/SessionServiceContainer';
 import { GetResponseStatus } from '@/server/application/use-cases/results/GetResponseStatus';
-import { createGameRepository, createAnswerRepository } from '@/server/infrastructure/repositories';
+import { SessionServiceContainer } from '@/server/infrastructure/di/SessionServiceContainer';
+import { createAnswerRepository, createGameRepository } from '@/server/infrastructure/repositories';
 
 interface PageProps {
   params: Promise<{ id: string }>;

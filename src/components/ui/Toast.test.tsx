@@ -2,8 +2,7 @@
 // Feature: Enhanced status transition feedback
 // Tests for toast notification component with animations
 
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Toast, ToastContainer, type ToastProps } from './Toast';
 

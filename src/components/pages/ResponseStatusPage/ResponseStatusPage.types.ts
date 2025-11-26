@@ -2,8 +2,8 @@
 // Feature: 006-results-dashboard, User Story 1
 
 import type {
-  ResponseStatusDto,
   ParticipantStatusDto,
+  ResponseStatusDto,
 } from '@/server/application/dto/ResponseStatusDto';
 
 /**

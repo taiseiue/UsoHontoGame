@@ -3,6 +3,10 @@
 // Tasks: T027-T028
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { IAnswerRepository } from '@/server/domain/repositories/IAnswerRepository';
+import type { IGameRepository } from '@/server/domain/repositories/IGameRepository';
+import type { IParticipationRepository } from '@/server/domain/repositories/IParticipationRepository';
+import type { ISessionService } from '@/server/domain/repositories/ISessionService';
 import { getGameForAnswersAction, submitAnswerAction } from './answers';
 
 // Create mock instances that will be reused
@@ -16,13 +20,17 @@ const mockSubmitAnswer = {
 
 // Mock the use case classes with proper constructors
 vi.mock('@/server/application/use-cases/answers/GetGameForAnswers', () => ({
-  GetGameForAnswers: vi.fn().mockImplementation(function (this: any) {
+  GetGameForAnswers: vi.fn().mockImplementation(function (this: {
+    execute: typeof mockGetGameForAnswers.execute;
+  }) {
     Object.assign(this, mockGetGameForAnswers);
   }),
 }));
 
 vi.mock('@/server/application/use-cases/answers/SubmitAnswer', () => ({
-  SubmitAnswer: vi.fn().mockImplementation(function (this: any) {
+  SubmitAnswer: vi.fn().mockImplementation(function (this: {
+    execute: typeof mockSubmitAnswer.execute;
+  }) {
     Object.assign(this, mockSubmitAnswer);
   }),
 }));
@@ -47,23 +55,25 @@ const mockValidateSession = {
 };
 
 vi.mock('@/server/application/use-cases/session/ValidateSession', () => ({
-  ValidateSession: vi.fn().mockImplementation(function (this: any) {
+  ValidateSession: vi.fn().mockImplementation(function (this: {
+    execute: typeof mockValidateSession.execute;
+  }) {
     Object.assign(this, mockValidateSession);
   }),
 }));
 
 // Mock CookieSessionRepository
 vi.mock('@/server/infrastructure/repositories/CookieSessionRepository', () => ({
-  CookieSessionRepository: vi.fn(function (this: any) {
+  CookieSessionRepository: vi.fn(function (this: Record<string, never>) {
     return {};
   }),
 }));
 
 describe('Answer Submission Server Actions', () => {
-  let mockGameRepository: any;
-  let mockAnswerRepository: any;
-  let mockParticipationRepository: any;
-  let mockSessionService: any;
+  let mockGameRepository: IGameRepository;
+  let mockAnswerRepository: IAnswerRepository;
+  let mockParticipationRepository: IParticipationRepository;
+  let mockSessionService: ISessionService;
 
   beforeEach(async () => {
     mockGameRepository = {

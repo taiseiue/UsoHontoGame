@@ -1,14 +1,15 @@
 /**
  * GetActiveGames Use Case
  * Feature: 005-top-active-games
+ * Feature: 007-game-closure - Updated to include both '出題中' and '締切' games
  *
- * Fetches active games (出題中 status) for display on TOP page
+ * Fetches active and closed games (出題中 and 締切 statuses) for display on TOP page
  * Ordered by creation date (newest first) with pagination support
  */
 
+import { formatRelativeTime } from '@/lib/date-utils';
 import type { IGameRepository } from '@/server/domain/repositories/IGameRepository';
 import type { ActiveGameListItem } from '@/types/game';
-import { formatRelativeTime } from '@/lib/date-utils';
 
 export interface GetActiveGamesParams {
   cursor?: string;
@@ -60,6 +61,7 @@ export class GetActiveGames {
     playerCount: number;
     playerLimit: number | null;
     creatorId: string;
+    status: '出題中' | '締切';
   }): ActiveGameListItem {
     return {
       id: game.id,
@@ -69,6 +71,7 @@ export class GetActiveGames {
       playerLimit: game.playerLimit,
       formattedCreatedAt: formatRelativeTime(game.createdAt),
       creatorId: game.creatorId,
+      status: game.status,
     };
   }
 }
