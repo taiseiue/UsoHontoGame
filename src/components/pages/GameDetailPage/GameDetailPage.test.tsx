@@ -101,4 +101,95 @@ describe('GameDetailPage', () => {
     const dateElements = screen.getAllByText(/2024/);
     expect(dateElements.length).toBeGreaterThan(0);
   });
+
+  it('should show CloseGameButton when status is 出題中 and user is moderator', () => {
+    // Tests line 81-91 branch: currentStatus === '出題中' && isModerator (true)
+    const game = mockGameDetail({
+      id: 'test-game-id',
+      status: '出題中',
+      creatorId: 'creator-session-123',
+    });
+
+    render(<GameDetailPage game={game} currentSessionId="creator-session-123" />);
+
+    // CloseGameButton renders with "締切にする" button text
+    expect(screen.getByRole('button', { name: /締切にする/ })).toBeInTheDocument();
+  });
+
+  it('should hide CloseGameButton when status is 出題中 but user is not moderator', () => {
+    // Tests line 81-91 branch: currentStatus === '出題中' && isModerator (false)
+    const game = mockGameDetail({
+      id: 'test-game-id',
+      status: '出題中',
+      creatorId: 'creator-session-123',
+    });
+
+    render(<GameDetailPage game={game} currentSessionId="different-session-456" />);
+
+    // CloseGameButton should NOT be visible
+    expect(screen.queryByTestId('close-game-button')).not.toBeInTheDocument();
+  });
+
+  it('should hide CloseGameButton when currentSessionId is not provided', () => {
+    // Tests line 45 branch: isModerator check when currentSessionId is undefined
+    const game = mockGameDetail({
+      id: 'test-game-id',
+      status: '出題中',
+      creatorId: 'creator-session-123',
+    });
+
+    render(<GameDetailPage game={game} />);
+
+    // CloseGameButton should NOT be visible
+    expect(screen.queryByTestId('close-game-button')).not.toBeInTheDocument();
+  });
+
+  it('should show game.id as fallback when game.name is empty', () => {
+    // Tests line 137 branch: game.name || game.id fallback
+    const game = mockGameDetail({
+      id: 'fallback-game-id',
+      name: '',
+    });
+
+    render(<GameDetailPage game={game} />);
+
+    expect(screen.getByText('fallback-game-id')).toBeInTheDocument();
+  });
+
+  it('should show StatusTransitionButton when status is 準備中', () => {
+    // Tests line 66-79 branch: currentStatus === '準備中'
+    const game = mockGameDetail({
+      id: 'test-game-id',
+      status: '準備中',
+    });
+
+    render(<GameDetailPage game={game} />);
+
+    // StatusTransitionButton renders with "開始する" button text
+    expect(screen.getByRole('button', { name: /開始する/ })).toBeInTheDocument();
+  });
+
+  it('should hide StatusTransitionButton when status is not 準備中', () => {
+    // Tests line 66-79 branch: currentStatus === '準備中' (false)
+    const game = mockGameDetail({
+      id: 'test-game-id',
+      status: '出題中',
+    });
+
+    render(<GameDetailPage game={game} />);
+
+    // StatusTransitionButton should NOT be visible
+    expect(screen.queryByTestId('status-transition-button')).not.toBeInTheDocument();
+  });
+
+  it('should render presenter management section', () => {
+    // Additional coverage for presenter management section
+    const game = mockGameDetail({ id: 'test-game-123' });
+
+    render(<GameDetailPage game={game} />);
+
+    expect(screen.getByText('プレゼンター管理')).toBeInTheDocument();
+    expect(screen.getByText(/プレゼンターとエピソードを管理します/)).toBeInTheDocument();
+    expect(screen.getByText('プレゼンター管理ページへ →')).toBeInTheDocument();
+  });
 });
