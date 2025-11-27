@@ -309,4 +309,227 @@ describe('useGameStatus', () => {
       expect(mockCloseGameAction).not.toHaveBeenCalled();
     });
   });
+
+  describe('retry mechanism', () => {
+    it('should retry on failure when enableRetry is true', async () => {
+      // Tests line 98-99 branch: enableRetry && attempt < maxRetries (true branch)
+      let callCount = 0;
+      vi.mocked(mockStartGameAction).mockImplementation(async () => {
+        callCount++;
+        if (callCount < 3) {
+          return { success: false, errors: { _form: ['一時的なエラー'] } };
+        }
+        return { success: true };
+      });
+
+      const onSuccess = vi.fn();
+      const onError = vi.fn();
+
+      const { result } = renderHook(() =>
+        useGameStatus({
+          gameId: 'game-123',
+          initialStatus: '準備中',
+          onSuccess,
+          onError,
+          enableRetry: true,
+          maxRetries: 2,
+          retryDelay: 10, // Short delay for testing
+        })
+      );
+
+      await act(async () => {
+        result.current.startGame();
+      });
+
+      await waitFor(() => {
+        expect(callCount).toBe(3);
+        expect(result.current.currentStatus).toBe('出題中');
+        expect(onSuccess).toHaveBeenCalledWith('出題中');
+        expect(onError).not.toHaveBeenCalled();
+      });
+    });
+
+    it('should rollback after all retries are exhausted', async () => {
+      // Tests line 98-106 branch: retry exhaustion
+      vi.mocked(mockStartGameAction).mockResolvedValue({
+        success: false,
+        errors: { _form: ['永続的なエラー'] },
+      });
+
+      const onError = vi.fn();
+
+      const { result } = renderHook(() =>
+        useGameStatus({
+          gameId: 'game-123',
+          initialStatus: '準備中',
+          onSuccess: vi.fn(),
+          onError,
+          enableRetry: true,
+          maxRetries: 2,
+          retryDelay: 10,
+        })
+      );
+
+      await act(async () => {
+        result.current.startGame();
+      });
+
+      await waitFor(() => {
+        expect(result.current.currentStatus).toBe('準備中'); // Rolled back
+        expect(result.current.isLoading).toBe(false);
+        expect(onError).toHaveBeenCalledWith('永続的なエラー（3回試行後）');
+      });
+    });
+
+    it('should show retry count during retries', async () => {
+      // Tests line 70-75 branch: attempt !== 0 (retry path)
+      let callCount = 0;
+      vi.mocked(mockStartGameAction).mockImplementation(async () => {
+        callCount++;
+        if (callCount < 2) {
+          return { success: false, errors: { _form: ['一時的なエラー'] } };
+        }
+        return { success: true };
+      });
+
+      const { result } = renderHook(() =>
+        useGameStatus({
+          gameId: 'game-123',
+          initialStatus: '準備中',
+          onSuccess: vi.fn(),
+          onError: vi.fn(),
+          enableRetry: true,
+          maxRetries: 2,
+          retryDelay: 10,
+        })
+      );
+
+      await act(async () => {
+        result.current.startGame();
+      });
+
+      await waitFor(() => {
+        expect(result.current.retryCount).toBe(0); // Reset after success
+        expect(result.current.isRetrying).toBe(false);
+      });
+    });
+  });
+
+  describe('error handling edge cases', () => {
+    it('should handle error without _form field', async () => {
+      // Tests line 86-89 branch: fallback error message when result.errors._form is undefined
+      vi.mocked(mockStartGameAction).mockResolvedValue({
+        success: false,
+        errors: { gameId: ['Invalid game ID'] },
+      });
+
+      const onError = vi.fn();
+
+      const { result } = renderHook(() =>
+        useGameStatus({
+          gameId: 'game-123',
+          initialStatus: '準備中',
+          onSuccess: vi.fn(),
+          onError,
+          enableRetry: false,
+        })
+      );
+
+      await act(async () => {
+        result.current.startGame();
+      });
+
+      await waitFor(() => {
+        expect(onError).toHaveBeenCalledWith('ゲームの開始に失敗しました');
+      });
+    });
+
+    it('should handle non-Error exceptions', async () => {
+      // Tests line 92-95 branch: error is not instanceof Error
+      vi.mocked(mockStartGameAction).mockRejectedValue('String error');
+
+      const onError = vi.fn();
+
+      const { result } = renderHook(() =>
+        useGameStatus({
+          gameId: 'game-123',
+          initialStatus: '準備中',
+          onSuccess: vi.fn(),
+          onError,
+          enableRetry: false,
+        })
+      );
+
+      await act(async () => {
+        result.current.startGame();
+      });
+
+      await waitFor(() => {
+        expect(onError).toHaveBeenCalledWith('ゲームの開始に失敗しました');
+      });
+    });
+  });
+
+  describe('confirmation dialog', () => {
+    it('should not close game when user cancels confirmation', async () => {
+      // Tests line 136-137 branch: !confirmed (false branch)
+      vi.stubGlobal(
+        'confirm',
+        vi.fn(() => false)
+      );
+
+      const { result } = renderHook(() =>
+        useGameStatus({
+          gameId: 'game-123',
+          initialStatus: '出題中',
+          onSuccess: vi.fn(),
+          onError: vi.fn(),
+        })
+      );
+
+      await act(async () => {
+        result.current.closeGame();
+      });
+
+      // Should not call the action since user cancelled
+      expect(mockCloseGameAction).not.toHaveBeenCalled();
+      expect(result.current.currentStatus).toBe('出題中');
+    });
+  });
+
+  describe('cleanup', () => {
+    it('should cleanup retry timeout when resetStatus is called during retry', async () => {
+      // Tests line 162-165 branch: retryTimeoutRef.current !== null
+      vi.mocked(mockStartGameAction).mockResolvedValue({
+        success: false,
+        errors: { _form: ['エラー'] },
+      });
+
+      const { result } = renderHook(() =>
+        useGameStatus({
+          gameId: 'game-123',
+          initialStatus: '準備中',
+          onSuccess: vi.fn(),
+          onError: vi.fn(),
+          enableRetry: true,
+          maxRetries: 3,
+          retryDelay: 1000, // Long delay to test timeout cleanup
+        })
+      );
+
+      // Start game (will trigger retries)
+      act(() => {
+        result.current.startGame();
+      });
+
+      // Reset during retry
+      act(() => {
+        result.current.resetStatus();
+      });
+
+      expect(result.current.currentStatus).toBe('準備中');
+      expect(result.current.retryCount).toBe(0);
+      expect(result.current.isRetrying).toBe(false);
+    });
+  });
 });
