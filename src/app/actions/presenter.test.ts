@@ -47,7 +47,12 @@ vi.mock('@/server/application/use-cases/games/AddPresenterWithEpisodes', () => (
 }));
 
 // Import after mocks
-const { addEpisodeAction, addPresenterAction, addPresenterWithEpisodesAction, removePresenterAction } = await import('./presenter');
+const {
+  addEpisodeAction,
+  addPresenterAction,
+  addPresenterWithEpisodesAction,
+  removePresenterAction,
+} = await import('./presenter');
 
 describe('Presenter Server Actions', () => {
   beforeEach(() => {
@@ -113,9 +118,7 @@ describe('Presenter Server Actions', () => {
     });
 
     it('should return error when session is not found', async () => {
-      mockSessionService.requireCurrentSession.mockRejectedValue(
-        new Error('Session not found')
-      );
+      mockSessionService.requireCurrentSession.mockRejectedValue(new Error('Session not found'));
 
       const formData = new FormData();
       formData.append('gameId', 'game-123');
@@ -125,7 +128,9 @@ describe('Presenter Server Actions', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.errors._form).toContain('セッションが見つかりません。ログインし直してください。');
+        expect(result.errors._form).toContain(
+          'セッションが見つかりません。ログインし直してください。'
+        );
       }
     });
 
@@ -189,9 +194,7 @@ describe('Presenter Server Actions', () => {
     });
 
     it('should return error when session is not found', async () => {
-      mockSessionService.requireCurrentSession.mockRejectedValue(
-        new Error('Session not found')
-      );
+      mockSessionService.requireCurrentSession.mockRejectedValue(new Error('Session not found'));
 
       const formData = new FormData();
       formData.append('gameId', 'game-123');
@@ -201,7 +204,9 @@ describe('Presenter Server Actions', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.errors._form).toContain('セッションが見つかりません。ログインし直してください。');
+        expect(result.errors._form).toContain(
+          'セッションが見つかりません。ログインし直してください。'
+        );
       }
     });
 
@@ -433,9 +438,7 @@ describe('Presenter Server Actions', () => {
     });
 
     it('should return error when session is not found', async () => {
-      mockSessionService.requireCurrentSession.mockRejectedValue(
-        new Error('Session not found')
-      );
+      mockSessionService.requireCurrentSession.mockRejectedValue(new Error('Session not found'));
 
       const formData = new FormData();
       formData.append('gameId', 'game-123');
@@ -451,7 +454,9 @@ describe('Presenter Server Actions', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.errors._form).toContain('セッションが見つかりません。ログインし直してください。');
+        expect(result.errors._form).toContain(
+          'セッションが見つかりません。ログインし直してください。'
+        );
       }
     });
   });

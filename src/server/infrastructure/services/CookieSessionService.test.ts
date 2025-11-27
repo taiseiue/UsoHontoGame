@@ -3,8 +3,8 @@
  * Tests for cookie-based session service implementation
  */
 
-import { COOKIE_NAMES } from '@/lib/constants';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { COOKIE_NAMES } from '@/lib/constants';
 import { CookieSessionService } from './CookieSessionService';
 
 // Mock cookie utilities

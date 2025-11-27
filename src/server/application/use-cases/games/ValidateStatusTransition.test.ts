@@ -1,28 +1,29 @@
 import { beforeEach, describe, expect, it, type MockedFunction, vi } from 'vitest';
 import type { Game } from '../../../domain/entities/Game';
 import { StatusTransitionError } from '../../../domain/errors/StatusTransitionError';
+import type { IGameRepository } from '../../../domain/repositories/IGameRepository';
 import { GameStatus } from '../../../domain/value-objects/GameStatus';
 import { ValidateStatusTransition } from './ValidateStatusTransition';
 
 describe('ValidateStatusTransition', () => {
   let validateStatusTransition: ValidateStatusTransition;
   let mockGameRepository: {
-    findById: MockedFunction<any>;
-    findByCreatorId: MockedFunction<any>;
-    findAll: MockedFunction<any>;
-    findByStatus: MockedFunction<any>;
-    create: MockedFunction<any>;
-    update: MockedFunction<any>;
-    delete: MockedFunction<any>;
-    findPresentersByGameId: MockedFunction<any>;
-    findPresenterById: MockedFunction<any>;
-    addPresenter: MockedFunction<any>;
-    createPresenterWithEpisodes: MockedFunction<any>;
-    removePresenter: MockedFunction<any>;
-    findEpisodesByPresenterId: MockedFunction<any>;
-    addEpisode: MockedFunction<any>;
-    removeEpisode: MockedFunction<any>;
-    updateEpisode: MockedFunction<any>;
+    findById: MockedFunction<(...args: never[]) => unknown>;
+    findByCreatorId: MockedFunction<(...args: never[]) => unknown>;
+    findAll: MockedFunction<(...args: never[]) => unknown>;
+    findByStatus: MockedFunction<(...args: never[]) => unknown>;
+    create: MockedFunction<(...args: never[]) => unknown>;
+    update: MockedFunction<(...args: never[]) => unknown>;
+    delete: MockedFunction<(...args: never[]) => unknown>;
+    findPresentersByGameId: MockedFunction<(...args: never[]) => unknown>;
+    findPresenterById: MockedFunction<(...args: never[]) => unknown>;
+    addPresenter: MockedFunction<(...args: never[]) => unknown>;
+    createPresenterWithEpisodes: MockedFunction<(...args: never[]) => unknown>;
+    removePresenter: MockedFunction<(...args: never[]) => unknown>;
+    findEpisodesByPresenterId: MockedFunction<(...args: never[]) => unknown>;
+    addEpisode: MockedFunction<(...args: never[]) => unknown>;
+    removeEpisode: MockedFunction<(...args: never[]) => unknown>;
+    updateEpisode: MockedFunction<(...args: never[]) => unknown>;
   };
 
   const mockGameBase = {
@@ -55,7 +56,7 @@ describe('ValidateStatusTransition', () => {
       updateEpisode: vi.fn(),
     };
 
-    validateStatusTransition = new ValidateStatusTransition(mockGameRepository as any);
+    validateStatusTransition = new ValidateStatusTransition(mockGameRepository as IGameRepository);
   });
 
   describe('準備中 → 出題中 transition', () => {
@@ -298,7 +299,7 @@ describe('ValidateStatusTransition', () => {
       await expect(
         validateStatusTransition.execute(
           '550e8400-e29b-41d4-a716-446655440001',
-          '準備中' as any,
+          '準備中' as never,
           'session-123'
         )
       ).rejects.toThrow(StatusTransitionError);

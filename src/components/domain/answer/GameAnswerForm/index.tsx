@@ -60,7 +60,7 @@ export const GameAnswerForm: FC<GameAnswerFormProps> = ({
 
       {/* Success Message */}
       {successMessage && (
-        <output role="status" className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg block">
+        <output className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg block">
           {successMessage}
         </output>
       )}

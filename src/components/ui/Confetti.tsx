@@ -35,9 +35,9 @@ export function Confetti({ active, duration = 3000, particleCount = 50 }: Confet
 
   return (
     <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
-      {particles.map((particle, index) => (
+      {particles.map((particle) => (
         <div
-          key={index}
+          key={particle.id}
           className="absolute h-3 w-3 animate-confetti-fall"
           style={{
             left: `${particle.x}%`,

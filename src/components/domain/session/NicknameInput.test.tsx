@@ -16,8 +16,9 @@ vi.mock('@/components/ui/Input', () => ({
   Input: vi.fn(
     ({ label, placeholder, value, onChange, error, disabled, maxLength, required, type }) => (
       <div data-testid="input-wrapper">
-        <label>{label}</label>
+        <label htmlFor="test-input">{label}</label>
         <input
+          id="test-input"
           type={type}
           placeholder={placeholder}
           value={value}

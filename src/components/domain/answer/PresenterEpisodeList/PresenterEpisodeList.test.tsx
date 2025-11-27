@@ -242,9 +242,9 @@ describe('PresenterEpisodeList', () => {
       );
 
       const sections = screen.getAllByRole('region');
-      sections.forEach((section) => {
+      for (const section of sections) {
         expect(section).toHaveClass('border');
-      });
+      }
     });
 
     it('should apply consistent spacing between presenters', () => {
@@ -277,9 +277,9 @@ describe('PresenterEpisodeList', () => {
       );
 
       const buttons = screen.getAllByRole('button');
-      buttons.forEach((button) => {
+      for (const button of buttons) {
         expect(button).toBeDisabled();
-      });
+      }
     });
 
     it('should not call onSelectEpisode when disabled', async () => {
@@ -334,9 +334,9 @@ describe('PresenterEpisodeList', () => {
       );
 
       const regions = screen.getAllByRole('region');
-      regions.forEach((region) => {
+      for (const region of regions) {
         expect(region).toHaveAccessibleName();
-      });
+      }
     });
 
     it('should maintain keyboard navigation across all presenters', async () => {

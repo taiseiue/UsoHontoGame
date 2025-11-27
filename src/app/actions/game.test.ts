@@ -474,7 +474,9 @@ describe('Status Transition Server Actions', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.errors._form).toContain('セッションが見つかりません。ログインし直してください。');
+        expect(result.errors._form).toContain(
+          'セッションが見つかりません。ログインし直してください。'
+        );
       }
     });
 
@@ -535,7 +537,9 @@ describe('Status Transition Server Actions', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.errors._form).toContain('セッションが見つかりません。ログインし直してください。');
+        expect(result.errors._form).toContain(
+          'セッションが見つかりません。ログインし直してください。'
+        );
       }
     });
 
@@ -718,7 +722,9 @@ describe('Status Transition Server Actions', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.errors._form).toContain('セッションが見つかりません。ログインし直してください。');
+        expect(result.errors._form).toContain(
+          'セッションが見つかりません。ログインし直してください。'
+        );
       }
     });
   });

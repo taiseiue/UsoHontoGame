@@ -56,7 +56,7 @@ export function useGameStatus({
 
   const executeWithRetry = useCallback(
     async (
-      action: () => Promise<{ success: boolean; errors?: any }>,
+      action: () => Promise<{ success: boolean; errors?: Record<string, string[]> }>,
       targetStatus: GameStatusValue,
       operation: 'start' | 'close',
       attempt = 0

@@ -10,8 +10,6 @@ import type { PresenterWithLieDto } from '@/server/application/dto/PresenterWith
 import { AddEpisode } from '@/server/application/use-cases/games/AddEpisode';
 import { AddPresenter } from '@/server/application/use-cases/games/AddPresenter';
 import { AddPresenterWithEpisodes } from '@/server/application/use-cases/games/AddPresenterWithEpisodes';
-import { GetPresenterEpisodes } from '@/server/application/use-cases/games/GetPresenterEpisodes';
-import { GetPresentersByGameId } from '@/server/application/use-cases/games/GetPresentersByGameId';
 import { RemovePresenter } from '@/server/application/use-cases/games/RemovePresenter';
 import {
   AddEpisodeSchema,

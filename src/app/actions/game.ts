@@ -25,7 +25,7 @@ import {
 } from '@/server/domain/schemas/gameSchemas';
 import { GameId } from '@/server/domain/value-objects/GameId';
 import { SessionServiceContainer } from '@/server/infrastructure/di/SessionServiceContainer';
-import { createAnswerRepository, createGameRepository } from '@/server/infrastructure/repositories';
+import { createGameRepository } from '@/server/infrastructure/repositories';
 
 /**
  * Helper function to get session ID with consistent error handling

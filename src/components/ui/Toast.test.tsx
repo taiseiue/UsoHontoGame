@@ -377,14 +377,14 @@ describe('ToastContainer', () => {
     it('should render container with proper region role', () => {
       render(<ToastContainer toasts={[]} onClose={vi.fn()} />);
 
-      const region = screen.getByRole('region', { name: '通知領域' });
+      const region = screen.getByRole('complementary', { name: '通知領域' });
       expect(region).toBeInTheDocument();
     });
 
     it('should render empty container when no toasts', () => {
       render(<ToastContainer toasts={[]} onClose={vi.fn()} />);
 
-      const region = screen.getByRole('region', { name: '通知領域' });
+      const region = screen.getByRole('complementary', { name: '通知領域' });
       expect(region).toBeEmptyDOMElement();
     });
 
@@ -437,21 +437,21 @@ describe('ToastContainer', () => {
     it('should have fixed positioning at top-right', () => {
       render(<ToastContainer toasts={[]} onClose={vi.fn()} />);
 
-      const region = screen.getByRole('region', { name: '通知領域' });
+      const region = screen.getByRole('complementary', { name: '通知領域' });
       expect(region).toHaveClass('fixed', 'top-4', 'right-4');
     });
 
     it('should have high z-index for stacking', () => {
       render(<ToastContainer toasts={[]} onClose={vi.fn()} />);
 
-      const region = screen.getByRole('region', { name: '通知領域' });
+      const region = screen.getByRole('complementary', { name: '通知領域' });
       expect(region).toHaveClass('z-50');
     });
 
     it('should have max width constraint', () => {
       render(<ToastContainer toasts={[]} onClose={vi.fn()} />);
 
-      const region = screen.getByRole('region', { name: '通知領域' });
+      const region = screen.getByRole('complementary', { name: '通知領域' });
       expect(region).toHaveClass('max-w-sm');
     });
   });
@@ -532,7 +532,7 @@ describe('ToastContainer', () => {
 
       render(<ToastContainer toasts={toasts} onClose={vi.fn()} />);
 
-      expect(screen.getByText('成功')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: '成功' })).toBeInTheDocument();
       expect(screen.getByText('操作が完了しました')).toBeInTheDocument();
     });
 

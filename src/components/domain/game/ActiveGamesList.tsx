@@ -27,16 +27,15 @@ export function ActiveGamesList({ games, currentSessionId }: ActiveGamesListProp
   }
 
   return (
-    <div
+    <ul
       className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
-      role="list"
       aria-label="出題中のゲーム一覧"
     >
       {games.map((game) => (
-        <div key={game.id} role="listitem">
+        <li key={game.id}>
           <ActiveGameCard game={game} currentSessionId={currentSessionId} />
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

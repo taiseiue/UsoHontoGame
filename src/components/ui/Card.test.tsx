@@ -237,8 +237,8 @@ describe('Card', () => {
     it('should handle array of children', () => {
       render(
         <Card>
-          {['Item 1', 'Item 2', 'Item 3'].map((item, index) => (
-            <div key={index}>{item}</div>
+          {['Item 1', 'Item 2', 'Item 3'].map((item) => (
+            <div key={item}>{item}</div>
           ))}
         </Card>
       );
@@ -275,9 +275,9 @@ describe('Card', () => {
       );
 
       const cards = container.querySelectorAll('div.rounded-lg');
-      cards.forEach((card) => {
+      for (const card of cards) {
         expect(card).toHaveClass('border', 'bg-white', 'p-6');
-      });
+      }
     });
   });
 

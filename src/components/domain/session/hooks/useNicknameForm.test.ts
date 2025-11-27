@@ -436,12 +436,12 @@ describe('useNicknameForm', () => {
   describe('Transition State', () => {
     it('should set isSubmitting to true during async operation', async () => {
       // Mock action to have a delay
-      let resolveAction: (value: any) => void;
+      let resolveAction: (value: unknown) => void;
       const actionPromise = new Promise((resolve) => {
         resolveAction = resolve;
       });
 
-      vi.mocked(setNicknameAction).mockImplementation(() => actionPromise as any);
+      vi.mocked(setNicknameAction).mockImplementation(() => actionPromise as Promise<void>);
 
       const { result } = renderHook(() => useNicknameForm());
 

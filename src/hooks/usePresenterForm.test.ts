@@ -37,12 +37,12 @@ describe('usePresenterForm', () => {
   // Helper to create a real form element with form data
   const createFormEvent = (data: Record<string, string>) => {
     const form = document.createElement('form');
-    Object.entries(data).forEach(([key, value]) => {
+    for (const [key, value] of Object.entries(data)) {
       const input = document.createElement('input');
       input.name = key;
       input.value = value;
       form.appendChild(input);
-    });
+    }
 
     return {
       preventDefault: vi.fn(),
@@ -372,11 +372,13 @@ describe('usePresenterForm', () => {
       });
 
       // Mock action with delayed resolution
-      let resolveAction: (value: any) => void;
+      let resolveAction: (value: unknown) => void;
       const actionPromise = new Promise((resolve) => {
         resolveAction = resolve;
       });
-      vi.mocked(addPresenterAction).mockImplementation(() => actionPromise as any);
+      vi.mocked(addPresenterAction).mockImplementation(
+        () => actionPromise as Promise<{ success: boolean }>
+      );
 
       const { result } = renderHook(() => usePresenterForm({ gameId: 'game-123' }));
       const mockEvent = createFormEvent({ nickname: 'Presenter' });

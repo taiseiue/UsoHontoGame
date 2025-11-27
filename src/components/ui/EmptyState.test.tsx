@@ -10,21 +10,21 @@ describe('EmptyState', () => {
     it('should render empty state container', () => {
       const { container } = render(<EmptyState message="No data" />);
 
-      const emptyState = container.querySelector('[role="status"]');
+      const emptyState = container.querySelector('output');
       expect(emptyState).toBeInTheDocument();
     });
 
-    it('should render as div element', () => {
+    it('should render as output element', () => {
       const { container } = render(<EmptyState message="Test" />);
 
       const emptyState = container.firstChild;
-      expect(emptyState).toBeInstanceOf(HTMLDivElement);
+      expect(emptyState).toBeInstanceOf(HTMLOutputElement);
     });
 
     it('should have proper container styles', () => {
       const { container } = render(<EmptyState message="No data" />);
 
-      const emptyState = container.querySelector('[role="status"]');
+      const emptyState = container.querySelector('output');
       expect(emptyState).toHaveClass(
         'flex',
         'flex-col',
@@ -44,7 +44,7 @@ describe('EmptyState', () => {
     });
 
     it('should style main message correctly', () => {
-      const { container } = render(<EmptyState message="Main message" />);
+      render(<EmptyState message="Main message" />);
 
       const message = screen.getByText('Main message');
       expect(message).toHaveClass('text-lg', 'font-medium', 'text-gray-900', 'text-center', 'mb-2');
@@ -194,7 +194,8 @@ describe('EmptyState', () => {
         <EmptyState
           message="No data"
           icon={
-            <svg data-testid="svg-icon">
+            <svg data-testid="svg-icon" aria-label="Icon">
+              <title>Icon</title>
               <circle cx="10" cy="10" r="10" />
             </svg>
           }
@@ -205,9 +206,18 @@ describe('EmptyState', () => {
     });
 
     it('should render icon with image', () => {
-      render(<EmptyState message="No data" icon={<img src="/icon.png" alt="Empty icon" />} />);
+      render(
+        <EmptyState
+          message="No data"
+          icon={
+            <span role="img" aria-label="Empty icon">
+              🚫
+            </span>
+          }
+        />
+      );
 
-      expect(screen.getByAltText('Empty icon')).toBeInTheDocument();
+      expect(screen.getByLabelText('Empty icon')).toBeInTheDocument();
     });
 
     it('should style icon container correctly', () => {
@@ -226,7 +236,7 @@ describe('EmptyState', () => {
       const message = screen.getByText('No data');
 
       // Icon should come before message in DOM
-      const emptyState = container.querySelector('[role="status"]');
+      const emptyState = container.querySelector('output');
       const children = Array.from(emptyState?.children || []);
       const iconIndex = children.indexOf(icon.parentElement!);
       const messageIndex = children.indexOf(message);
@@ -281,11 +291,12 @@ describe('EmptyState', () => {
   });
 
   describe('Accessibility', () => {
-    it('should have role="status"', () => {
+    it('should render as output element (implicit status role)', () => {
       const { container } = render(<EmptyState message="No data" />);
 
-      const emptyState = container.querySelector('[role="status"]');
+      const emptyState = container.querySelector('output');
       expect(emptyState).toBeInTheDocument();
+      expect(emptyState?.tagName).toBe('OUTPUT');
     });
 
     it('should have aria-live="polite"', () => {
@@ -315,28 +326,28 @@ describe('EmptyState', () => {
     it('should use flexbox column layout', () => {
       const { container } = render(<EmptyState message="No data" />);
 
-      const emptyState = container.querySelector('[role="status"]');
+      const emptyState = container.querySelector('output');
       expect(emptyState).toHaveClass('flex', 'flex-col');
     });
 
     it('should center content horizontally and vertically', () => {
       const { container } = render(<EmptyState message="No data" />);
 
-      const emptyState = container.querySelector('[role="status"]');
+      const emptyState = container.querySelector('output');
       expect(emptyState).toHaveClass('items-center', 'justify-center');
     });
 
     it('should have vertical padding', () => {
       const { container } = render(<EmptyState message="No data" />);
 
-      const emptyState = container.querySelector('[role="status"]');
+      const emptyState = container.querySelector('output');
       expect(emptyState).toHaveClass('py-12');
     });
 
     it('should have horizontal padding', () => {
       const { container } = render(<EmptyState message="No data" />);
 
-      const emptyState = container.querySelector('[role="status"]');
+      const emptyState = container.querySelector('output');
       expect(emptyState).toHaveClass('px-4');
     });
   });

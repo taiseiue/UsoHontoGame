@@ -79,7 +79,7 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
 
       {/* Screen reader announcements */}
       <div className="sr-only">
-        <div ref={politeAnnouncerRef} aria-live="polite" aria-atomic="true" role="status" />
+        <output ref={politeAnnouncerRef} aria-live="polite" aria-atomic="true" />
         <div ref={assertiveAnnouncerRef} aria-live="assertive" aria-atomic="true" role="alert" />
       </div>
     </AccessibilityContext.Provider>

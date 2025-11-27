@@ -212,7 +212,7 @@ describe('CloseGameButton', () => {
       const mockOnClosed = vi.fn();
       let capturedOnSuccess: (() => void) | undefined;
 
-      vi.mocked(mockUseCloseGame).mockImplementation((config: any) => {
+      vi.mocked(mockUseCloseGame).mockImplementation((config: { onSuccess?: () => void }) => {
         capturedOnSuccess = config.onSuccess;
         return {
           closeGame: vi.fn(),
@@ -239,14 +239,16 @@ describe('CloseGameButton', () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       let capturedOnError: ((error: string) => void) | undefined;
 
-      vi.mocked(mockUseCloseGame).mockImplementation((config: any) => {
-        capturedOnError = config.onError;
-        return {
-          closeGame: vi.fn(),
-          isClosing: false,
-          error: null,
-        };
-      });
+      vi.mocked(mockUseCloseGame).mockImplementation(
+        (config: { onError?: (error: string) => void }) => {
+          capturedOnError = config.onError;
+          return {
+            closeGame: vi.fn(),
+            isClosing: false,
+            error: null,
+          };
+        }
+      );
 
       render(
         <TestWrapper>

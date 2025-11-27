@@ -301,11 +301,11 @@ describe('useAnswerSubmission', () => {
 
     it('should set isSubmitting during submission', async () => {
       const { submitAnswerAction } = await import('@/app/actions/answers');
-      let resolveSubmit: (value: any) => void;
+      let resolveSubmit: (value: unknown) => void;
       const submitPromise = new Promise((resolve) => {
         resolveSubmit = resolve;
       });
-      vi.mocked(submitAnswerAction).mockReturnValue(submitPromise as any);
+      vi.mocked(submitAnswerAction).mockReturnValue(submitPromise as Promise<{ success: boolean }>);
 
       const { result } = renderHook(() =>
         useAnswerSubmission({

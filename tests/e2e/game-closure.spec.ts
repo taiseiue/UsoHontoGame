@@ -36,7 +36,9 @@ test.describe('Game Closure Flow', () => {
     await expect(page.locator('text=準備中')).toBeVisible();
   });
 
-  test('should display "ゲーム終了" indicator on dashboard for closed game', async ({ page }) => {
+  test('should display "ゲーム終了" indicator on dashboard for closed game', async ({
+    page: _page,
+  }) => {
     // This is a placeholder test that would require:
     // 1. Creating a game
     // 2. Adding presenters and episodes
@@ -49,7 +51,7 @@ test.describe('Game Closure Flow', () => {
     expect(true).toBe(true);
   });
 
-  test('should block answer submission for closed game', async ({ page }) => {
+  test('should block answer submission for closed game', async ({ page: _page }) => {
     // This test would verify that when a game is closed:
     // 1. The answer page shows an error message
     // 2. The submit button is not available
@@ -59,7 +61,7 @@ test.describe('Game Closure Flow', () => {
     expect(true).toBe(true);
   });
 
-  test('should stop dashboard polling when game is closed', async ({ page }) => {
+  test('should stop dashboard polling when game is closed', async ({ page: _page }) => {
     // This test would verify that:
     // 1. When viewing dashboard for an active game, it polls every 5 seconds
     // 2. When the game is closed, polling stops

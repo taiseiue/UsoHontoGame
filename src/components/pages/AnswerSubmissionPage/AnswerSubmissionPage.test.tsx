@@ -12,10 +12,14 @@ import { AnswerSubmissionPage } from './index';
 
 // Mock dependencies
 vi.mock('@/components/domain/answer/GameAnswerForm', () => ({
-  GameAnswerForm: ({ onSubmit, onReset, ...props }: any) => (
+  GameAnswerForm: ({ onSubmit, onReset, ...props }: Record<string, unknown>) => (
     <div data-testid="game-answer-form" data-props={JSON.stringify(props)}>
-      <button onClick={onSubmit}>Submit</button>
-      <button onClick={onReset}>Reset</button>
+      <button type="button" onClick={onSubmit as () => void}>
+        Submit
+      </button>
+      <button type="button" onClick={onReset as () => void}>
+        Reset
+      </button>
     </div>
   ),
 }));

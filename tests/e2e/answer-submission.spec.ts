@@ -293,7 +293,7 @@ test.describe('Answer Submission - Participant Journey', () => {
     await expect(page.getByText(/ゲームが見つかりませんでした/i)).toBeVisible();
   });
 
-  test('Error handling: Game in wrong status (not 出題中)', async ({ page }) => {
+  test('Error handling: Game in wrong status (not 出題中)', async ({ page: _page }) => {
     // Note: This test would require programmatic game creation in 準備中 or 締切 status
     // Skipping for now as it requires backend setup
     test.skip(true, 'Requires programmatic game creation in non-active status');
@@ -301,13 +301,19 @@ test.describe('Answer Submission - Participant Journey', () => {
 });
 
 test.describe('Answer Submission - Edge Cases', () => {
-  test('FR-015: Reject access to game with zero presenters', async ({ page, context }) => {
+  test('FR-015: Reject access to game with zero presenters', async ({
+    page: _page,
+    context: _context,
+  }) => {
     // Note: This test would require programmatic game creation with no presenters
     // Skipping for now as it requires backend setup
     test.skip(true, 'Requires programmatic game creation with zero presenters');
   });
 
-  test('FR-009: Reject access when participant limit reached', async ({ page, context }) => {
+  test('FR-009: Reject access when participant limit reached', async ({
+    page: _page,
+    context: _context,
+  }) => {
     // Note: This test would require:
     // 1. Creating game with maxParticipants=5
     // 2. Having 5 sessions submit answers

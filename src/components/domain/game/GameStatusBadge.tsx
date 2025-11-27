@@ -83,15 +83,14 @@ export function GameStatusBadge({
   const highlightClasses = isHighlighted ? 'ring-4 ring-blue-300 ring-opacity-50 scale-110' : '';
 
   return (
-    <span
+    <output
       ref={badgeRef}
       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border transition-all duration-300 ${config.className} ${highlightClasses} ${className}`}
       aria-label={config.ariaLabel}
       aria-live={animated ? 'polite' : undefined}
-      role="status"
     >
       {config.label}
-    </span>
+    </output>
   );
 }
 
@@ -161,14 +160,13 @@ export function GameStatusBadgeLarge({
   const highlightClasses = isHighlighted ? 'ring-4 ring-blue-300 ring-opacity-50 scale-110' : '';
 
   return (
-    <span
+    <output
       ref={badgeRef}
       className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold border-2 transition-all duration-300 ${config.className} ${highlightClasses} ${className}`}
       aria-label={config.ariaLabel}
       aria-live={animated ? 'polite' : undefined}
-      role="status"
     >
       {config.label}
-    </span>
+    </output>
   );
 }

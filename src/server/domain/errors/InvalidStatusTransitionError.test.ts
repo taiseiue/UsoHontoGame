@@ -6,7 +6,11 @@ import { InvalidStatusTransitionError } from './InvalidStatusTransitionError';
 
 describe('InvalidStatusTransitionError', () => {
   it('should create error with custom message', () => {
-    const error = new InvalidStatusTransitionError('準備中', '締切', '準備中から締切への遷移は無効です');
+    const error = new InvalidStatusTransitionError(
+      '準備中',
+      '締切',
+      '準備中から締切への遷移は無効です'
+    );
 
     expect(error).toBeInstanceOf(Error);
     expect(error).toBeInstanceOf(InvalidStatusTransitionError);

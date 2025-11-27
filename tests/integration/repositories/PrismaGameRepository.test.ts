@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { Episode } from '@/server/domain/entities/Episode';
 import { Game } from '@/server/domain/entities/Game';
@@ -6,7 +7,6 @@ import { GameId } from '@/server/domain/value-objects/GameId';
 import { GameStatus } from '@/server/domain/value-objects/GameStatus';
 import { PrismaGameRepository } from '@/server/infrastructure/repositories/PrismaGameRepository';
 import { createTestDatabase, type TestDatabase } from '../../utils/test-database';
-import { nanoid } from 'nanoid';
 
 describe('PrismaGameRepository', () => {
   let testDb: TestDatabase;
@@ -484,13 +484,7 @@ describe('PrismaGameRepository', () => {
     let testGame: Game;
 
     beforeEach(async () => {
-      testGame = createGame(
-        '550e8400-e29b-41d4-a716-446655440101',
-        'Test Game',
-        '出題中',
-        10,
-        5
-      );
+      testGame = createGame('550e8400-e29b-41d4-a716-446655440101', 'Test Game', '出題中', 10, 5);
       await repository.create(testGame);
     });
 
@@ -695,13 +689,7 @@ describe('PrismaGameRepository', () => {
     let testPresenter: Presenter;
 
     beforeEach(async () => {
-      testGame = createGame(
-        '550e8400-e29b-41d4-a716-446655440100',
-        'Test Game',
-        '出題中',
-        10,
-        5
-      );
+      testGame = createGame('550e8400-e29b-41d4-a716-446655440100', 'Test Game', '出題中', 10, 5);
       await repository.create(testGame);
 
       testPresenter = createPresenterWithEpisodes(testGame.id.value, 'Test Presenter');
@@ -907,7 +895,7 @@ describe('PrismaGameRepository', () => {
         const statuses = result.games.map((g) => g.status);
         expect(statuses).toContain('出題中');
         expect(statuses).toContain('締切');
-        expect(statuses).not.toContain('準備中' as any);
+        expect(statuses).not.toContain('準備中');
       });
 
       it('should return actual participation counts', async () => {

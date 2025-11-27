@@ -65,7 +65,7 @@ describe('AccessibilityProvider', () => {
       const politeRegion = document.querySelector('[aria-live="polite"]');
       expect(politeRegion).toHaveAttribute('aria-live', 'polite');
       expect(politeRegion).toHaveAttribute('aria-atomic', 'true');
-      expect(politeRegion).toHaveAttribute('role', 'status');
+      expect(politeRegion?.tagName).toBe('OUTPUT');
     });
 
     it('should render assertive announcer with correct attributes', () => {

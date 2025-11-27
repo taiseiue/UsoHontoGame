@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const limit = limitParam ? parseInt(limitParam, 10) : undefined;
 
     // Validate limit parameter
-    if (limitParam && (isNaN(limit!) || limit! < 1 || limit! > 100)) {
+    if (limitParam && (Number.isNaN(limit!) || limit! < 1 || limit! > 100)) {
       return NextResponse.json(
         { error: 'Bad Request', details: 'Limit must be between 1 and 100' },
         { status: 400 }

@@ -242,9 +242,9 @@ describe('PresenterWithEpisodesForm', () => {
 
       const episodeInputs = screen.getAllByPlaceholderText(/エピソード.*の内容を入力してください/);
 
-      episodeInputs.forEach((input) => {
+      for (const input of episodeInputs) {
         expect(input).toHaveAttribute('maxLength', '1000');
-      });
+      }
     });
   });
 
@@ -329,12 +329,12 @@ describe('PresenterWithEpisodesForm', () => {
 
       expect(submitButton).toBeDisabled();
       expect(nicknameInput).toBeDisabled();
-      episodeInputs.forEach((input) => {
+      for (const input of episodeInputs) {
         expect(input).toBeDisabled();
-      });
-      radioButtons.forEach((radio) => {
+      }
+      for (const radio of radioButtons) {
         expect(radio).toBeDisabled();
-      });
+      }
     });
 
     it('should show submitting text on button during submission', async () => {
@@ -730,9 +730,9 @@ describe('PresenterWithEpisodesForm', () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        episodeInputs.forEach((input) => {
+        for (const input of episodeInputs) {
           expect(input).toHaveClass('border-red-500');
-        });
+        }
       });
     });
   });
@@ -786,19 +786,19 @@ describe('PresenterWithEpisodesForm', () => {
       const labels = screen.getAllByText(/このエピソードをウソにする/);
       expect(labels).toHaveLength(3);
 
-      labels.forEach((label) => {
+      for (const label of labels) {
         expect(label).toHaveAttribute('for');
-      });
+      }
     });
 
     it('should have proper ARIA roles for radio group', () => {
       render(<PresenterWithEpisodesForm {...defaultProps} />);
 
       const radioButtons = screen.getAllByRole('radio');
-      radioButtons.forEach((radio) => {
+      for (const radio of radioButtons) {
         expect(radio).toHaveAttribute('type', 'radio');
         expect(radio).toHaveAttribute('name', 'lie-episode');
-      });
+      }
     });
   });
 

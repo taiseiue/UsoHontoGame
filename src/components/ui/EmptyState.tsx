@@ -21,11 +21,7 @@ export interface EmptyStateProps {
 
 export function EmptyState({ message, subMessage, action, icon }: EmptyStateProps) {
   return (
-    <div
-      className="flex flex-col items-center justify-center py-12 px-4"
-      role="status"
-      aria-live="polite"
-    >
+    <output className="flex flex-col items-center justify-center py-12 px-4" aria-live="polite">
       {icon && <div className="mb-4">{icon}</div>}
 
       <p className="text-lg font-medium text-gray-900 text-center mb-2">{message}</p>
@@ -33,6 +29,6 @@ export function EmptyState({ message, subMessage, action, icon }: EmptyStateProp
       {subMessage && <p className="text-sm text-gray-600 text-center mb-4">{subMessage}</p>}
 
       {action && <div className="mt-4">{action}</div>}
-    </div>
+    </output>
   );
 }

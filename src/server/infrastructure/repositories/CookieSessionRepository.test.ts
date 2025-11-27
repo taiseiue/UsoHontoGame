@@ -3,11 +3,11 @@
  * Tests for cookie-based session repository implementation
  */
 
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { COOKIE_NAMES } from '@/lib/constants';
 import { Session } from '@/server/domain/entities/Session';
 import { Nickname } from '@/server/domain/value-objects/Nickname';
 import { SessionId } from '@/server/domain/value-objects/SessionId';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CookieSessionRepository } from './CookieSessionRepository';
 
 // Mock cookie utilities
@@ -18,7 +18,7 @@ vi.mock('@/lib/cookies', () => ({
 }));
 
 // Helper to create valid 21-char nanoid-format session IDs
-function createValidSessionId(prefix: string): string {
+function _createValidSessionId(prefix: string): string {
   return `${prefix}${'_'.repeat(21 - prefix.length)}`.substring(0, 21);
 }
 
@@ -316,11 +316,7 @@ describe('CookieSessionRepository', () => {
 
       await repository.update(session);
 
-      expect(mockSetCookie).toHaveBeenCalledWith(
-        'nickname',
-        'ChangedNickname',
-        expect.any(Object)
-      );
+      expect(mockSetCookie).toHaveBeenCalledWith('nickname', 'ChangedNickname', expect.any(Object));
     });
 
     it('should handle removing nickname', async () => {

@@ -11,9 +11,9 @@ const mockPrismaClient = {
 };
 
 // Mock repository classes
-const mockGameRepository = { type: 'PrismaGameRepository' };
-const mockAnswerRepository = { type: 'PrismaAnswerRepository' };
-const mockParticipationRepository = { type: 'PrismaParticipationRepository' };
+const _mockGameRepository = { type: 'PrismaGameRepository' };
+const _mockAnswerRepository = { type: 'PrismaAnswerRepository' };
+const _mockParticipationRepository = { type: 'PrismaParticipationRepository' };
 
 // Create mock class constructors
 class MockPrismaClient {

@@ -237,9 +237,9 @@ describe('GameAnswerForm', () => {
       const episodeButtons = screen.getAllByRole('button', {
         name: /エピソード/i,
       });
-      episodeButtons.forEach((button) => {
+      for (const button of episodeButtons) {
         expect(button).toBeDisabled();
-      });
+      }
     });
   });
 
@@ -553,7 +553,7 @@ describe('GameAnswerForm', () => {
 
       const successMessage = screen.getByText('送信完了');
       expect(successMessage).toBeInTheDocument();
-      expect(successMessage.closest('[role="status"]')).toBeInTheDocument();
+      expect(successMessage.closest('output')).toBeInTheDocument();
     });
   });
 

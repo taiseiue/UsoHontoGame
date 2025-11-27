@@ -1,10 +1,10 @@
 // Unit tests for GameDetailPage component
 
 import { render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { GameDetailPage, GameDetailPageError } from '@/components/pages/GameDetailPage';
-import { mockGameDetail } from '../../../../tests/utils/test-helpers';
 import type { GameStatusValue } from '@/server/domain/value-objects/GameStatus';
+import { mockGameDetail } from '../../../../tests/utils/test-helpers';
 
 // Mock useGameStatus hook
 vi.mock('@/components/pages/GameDetailPage/hooks/useGameStatus', () => ({
@@ -35,8 +35,6 @@ vi.mock('@/components/domain/game/DeleteGameButton', () => ({
 
 vi.mock('@/components/domain/game/StatusTransitionButton', () => ({
   StatusTransitionButton: ({
-    gameId,
-    currentStatus,
     onSuccess,
     onError,
   }: {
@@ -47,6 +45,7 @@ vi.mock('@/components/domain/game/StatusTransitionButton', () => ({
   }) => (
     <div data-testid="status-transition-button">
       <button
+        type="button"
         onClick={() => {
           onSuccess?.('出題中');
         }}
@@ -54,6 +53,7 @@ vi.mock('@/components/domain/game/StatusTransitionButton', () => ({
         開始する
       </button>
       <button
+        type="button"
         onClick={() => {
           onError?.('Test error from StatusTransitionButton');
         }}
@@ -66,8 +66,6 @@ vi.mock('@/components/domain/game/StatusTransitionButton', () => ({
 
 vi.mock('@/components/domain/game/CloseGameButton', () => ({
   CloseGameButton: ({
-    gameId,
-    gameStatus,
     onClosed,
   }: {
     gameId: string;
@@ -76,6 +74,7 @@ vi.mock('@/components/domain/game/CloseGameButton', () => ({
   }) => (
     <div data-testid="close-game-button">
       <button
+        type="button"
         onClick={() => {
           onClosed?.();
         }}
@@ -86,8 +85,15 @@ vi.mock('@/components/domain/game/CloseGameButton', () => ({
   ),
 }));
 
+interface Toast {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+}
+
 vi.mock('@/components/ui/Toast', () => ({
-  ToastContainer: ({ toasts, onClose }: { toasts: any[]; onClose: (id: string) => void }) => (
+  ToastContainer: ({ toasts }: { toasts: Toast[] }) => (
     <div data-testid="toast-container">
       {toasts.map((toast) => (
         <div key={toast.id} data-testid={`toast-${toast.type}`}>
@@ -203,7 +209,7 @@ describe('GameDetailPage', () => {
 
   it('should show warning when game cannot be edited', () => {
     mockUseGameStatus.mockReturnValue({
-      currentStatus: '終了' as any,
+      currentStatus: '終了' as never,
       isLoading: false,
       canStart: false,
       canClose: false,
@@ -406,20 +412,22 @@ describe('GameDetailPage', () => {
     it('should call showSuccess when useGameStatus onSuccess is triggered with 出題中', () => {
       let capturedOnSuccess: ((newStatus: GameStatusValue) => void) | undefined;
 
-      mockUseGameStatus.mockImplementation((config: any) => {
-        capturedOnSuccess = config.onSuccess;
-        return {
-          currentStatus: '準備中',
-          isLoading: false,
-          canStart: true,
-          canClose: false,
-          startGame: vi.fn(),
-          closeGame: vi.fn(),
-          resetStatus: vi.fn(),
-          retryCount: 0,
-          isRetrying: false,
-        };
-      });
+      mockUseGameStatus.mockImplementation(
+        (config: { onSuccess?: (newStatus: GameStatusValue) => void }) => {
+          capturedOnSuccess = config.onSuccess;
+          return {
+            currentStatus: '準備中',
+            isLoading: false,
+            canStart: true,
+            canClose: false,
+            startGame: vi.fn(),
+            closeGame: vi.fn(),
+            resetStatus: vi.fn(),
+            retryCount: 0,
+            isRetrying: false,
+          };
+        }
+      );
 
       const game = mockGameDetail({ status: '準備中' });
       render(<GameDetailPage game={game} />);
@@ -433,20 +441,22 @@ describe('GameDetailPage', () => {
     it('should call showSuccess when useGameStatus onSuccess is triggered with 締切', () => {
       let capturedOnSuccess: ((newStatus: GameStatusValue) => void) | undefined;
 
-      mockUseGameStatus.mockImplementation((config: any) => {
-        capturedOnSuccess = config.onSuccess;
-        return {
-          currentStatus: '出題中',
-          isLoading: false,
-          canStart: false,
-          canClose: true,
-          startGame: vi.fn(),
-          closeGame: vi.fn(),
-          resetStatus: vi.fn(),
-          retryCount: 0,
-          isRetrying: false,
-        };
-      });
+      mockUseGameStatus.mockImplementation(
+        (config: { onSuccess?: (newStatus: GameStatusValue) => void }) => {
+          capturedOnSuccess = config.onSuccess;
+          return {
+            currentStatus: '出題中',
+            isLoading: false,
+            canStart: false,
+            canClose: true,
+            startGame: vi.fn(),
+            closeGame: vi.fn(),
+            resetStatus: vi.fn(),
+            retryCount: 0,
+            isRetrying: false,
+          };
+        }
+      );
 
       const game = mockGameDetail({ status: '出題中' });
       render(<GameDetailPage game={game} />);
@@ -460,7 +470,7 @@ describe('GameDetailPage', () => {
     it('should call showError when useGameStatus onError is triggered', () => {
       let capturedOnError: ((error: string) => void) | undefined;
 
-      mockUseGameStatus.mockImplementation((config: any) => {
+      mockUseGameStatus.mockImplementation((config: { onError?: (error: string) => void }) => {
         capturedOnError = config.onError;
         return {
           currentStatus: '準備中',
@@ -643,7 +653,9 @@ describe('GameDetailPage', () => {
       render(<GameDetailPage game={game} />);
 
       expect(screen.getByTestId('toast-container')).toBeInTheDocument();
-      expect(screen.getByTestId('toast-success')).toHaveTextContent('Success: Test success message');
+      expect(screen.getByTestId('toast-success')).toHaveTextContent(
+        'Success: Test success message'
+      );
       expect(screen.getByTestId('toast-error')).toHaveTextContent('Error: Test error message');
     });
 

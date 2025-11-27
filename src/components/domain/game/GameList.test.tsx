@@ -18,9 +18,9 @@ vi.mock('./GameCard', () => ({
     managementView?: boolean;
     onClick?: () => void;
   }) => (
-    <div data-testid={`game-card-${game.id}`} onClick={onClick} onKeyDown={() => {}}>
+    <button type="button" data-testid={`game-card-${game.id}`} onClick={onClick}>
       {game.name}
-    </div>
+    </button>
   ),
 }));
 

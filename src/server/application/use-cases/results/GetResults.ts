@@ -61,7 +61,7 @@ export class GetResults {
       > = {};
       let totalScore = 0;
 
-      presenterData.forEach((presenter) => {
+      for (const presenter of presenterData) {
         const selectedEpisodeId = answer.selections.get(presenter.presenterId) || '';
         const selectedEpisode = presenter.episodes.find((ep) => ep.id === selectedEpisodeId);
         const wasCorrect = selectedEpisodeId === presenter.lieEpisodeId;
@@ -75,7 +75,7 @@ export class GetResults {
         if (wasCorrect) {
           totalScore += 10;
         }
-      });
+      }
 
       return {
         nickname: answer.nickname,

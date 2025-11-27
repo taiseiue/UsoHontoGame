@@ -31,11 +31,7 @@ vi.mock('./GameList', () => ({
       <div data-testid="management-view">{String(managementView)}</div>
       <div data-testid="games-count">{games.length}</div>
       {onGameClick && (
-        <button
-          type="button"
-          onClick={() => onGameClick('test-game-id')}
-          data-testid="test-click"
-        >
+        <button type="button" onClick={() => onGameClick('test-game-id')} data-testid="test-click">
           Click Game
         </button>
       )}

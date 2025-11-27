@@ -100,7 +100,7 @@ describe('GameStatusBadge', () => {
       const badge = screen.getByText('準備中');
       expect(badge).toHaveAttribute('aria-label', 'ゲームは準備中です');
       expect(badge).toHaveAttribute('aria-live', 'polite');
-      expect(badge).toHaveAttribute('role', 'status');
+      expect(badge.tagName).toBe('OUTPUT');
     });
   });
 
@@ -152,7 +152,7 @@ describe('GameStatusBadge', () => {
       const badge = screen.getByText('出題中');
       expect(badge).toHaveAttribute('aria-label', 'ゲームは出題中です');
       expect(badge).toHaveAttribute('aria-live', 'polite');
-      expect(badge).toHaveAttribute('role', 'status');
+      expect(badge.tagName).toBe('OUTPUT');
     });
   });
 
@@ -160,7 +160,7 @@ describe('GameStatusBadge', () => {
     it('should handle unknown status with default styling', () => {
       render(
         <TestWrapper>
-          <GameStatusBadge status={'unknown' as any} />
+          <GameStatusBadge status={'unknown' as never} />
         </TestWrapper>
       );
 
@@ -212,7 +212,7 @@ describe('GameStatusBadge', () => {
       expect(badge).not.toHaveAttribute('aria-live', 'polite');
     });
 
-    it('should always have role="status" for accessibility', () => {
+    it('should always render as output element for accessibility', () => {
       render(
         <TestWrapper>
           <GameStatusBadge status="準備中" animated={false} />
@@ -220,7 +220,7 @@ describe('GameStatusBadge', () => {
       );
 
       const badge = screen.getByText('準備中');
-      expect(badge).toHaveAttribute('role', 'status');
+      expect(badge.tagName).toBe('OUTPUT');
     });
   });
 
@@ -228,7 +228,7 @@ describe('GameStatusBadge', () => {
     it('should handle unknown status with default styling', () => {
       render(
         <TestWrapper>
-          <GameStatusBadgeLarge status={'unknown' as any} />
+          <GameStatusBadgeLarge status={'unknown' as never} />
         </TestWrapper>
       );
 
@@ -279,7 +279,7 @@ describe('GameStatusBadge', () => {
       expect(badge).not.toHaveAttribute('aria-live', 'polite');
     });
 
-    it('should always have role="status" for accessibility', () => {
+    it('should always render as output element for accessibility', () => {
       render(
         <TestWrapper>
           <GameStatusBadgeLarge status="出題中" animated={false} />
@@ -287,7 +287,7 @@ describe('GameStatusBadge', () => {
       );
 
       const badge = screen.getByText('出題中');
-      expect(badge).toHaveAttribute('role', 'status');
+      expect(badge.tagName).toBe('OUTPUT');
     });
   });
 });

@@ -31,12 +31,12 @@ describe('useGameForm', () => {
   const createMockFormEvent = (fields: Record<string, string>) => {
     const formElement = document.createElement('form');
 
-    Object.entries(fields).forEach(([key, value]) => {
+    for (const [key, value] of Object.entries(fields)) {
       const input = document.createElement('input');
       input.name = key;
       input.value = value;
       formElement.appendChild(input);
-    });
+    }
 
     return {
       preventDefault: vi.fn(),
@@ -430,10 +430,7 @@ describe('useGameForm', () => {
           expect(result.current.errors).toEqual({
             _form: ['予期しないエラーが発生しました'],
           });
-          expect(consoleErrorSpy).toHaveBeenCalledWith(
-            'Form submission error:',
-            expect.any(Error)
-          );
+          expect(consoleErrorSpy).toHaveBeenCalledWith('Form submission error:', expect.any(Error));
         });
 
         consoleErrorSpy.mockRestore();
@@ -454,10 +451,7 @@ describe('useGameForm', () => {
           expect(result.current.errors).toEqual({
             _form: ['予期しないエラーが発生しました'],
           });
-          expect(consoleErrorSpy).toHaveBeenCalledWith(
-            'Form submission error:',
-            expect.any(Error)
-          );
+          expect(consoleErrorSpy).toHaveBeenCalledWith('Form submission error:', expect.any(Error));
         });
 
         consoleErrorSpy.mockRestore();

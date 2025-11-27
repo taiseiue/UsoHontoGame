@@ -176,7 +176,15 @@ describe('useAnswerSubmissionPage', () => {
     });
 
     it('should set error state on fetch failure', async () => {
-      mockFetch.mockReturnValueOnce(createMockResponse({ error: 'プレゼンターの取得に失敗しました', details: 'プレゼンターの取得に失敗しました' }, false));
+      mockFetch.mockReturnValueOnce(
+        createMockResponse(
+          {
+            error: 'プレゼンターの取得に失敗しました',
+            details: 'プレゼンターの取得に失敗しました',
+          },
+          false
+        )
+      );
 
       const { result } = renderHook(() => useAnswerSubmissionPage({ gameId: mockGameId }));
 
@@ -201,11 +209,11 @@ describe('useAnswerSubmissionPage', () => {
     });
 
     it('should not update state if component unmounts during fetch', async () => {
-      let resolveFetch: (value: any) => void;
+      let resolveFetch: (value: unknown) => void;
       const fetchPromise = new Promise((resolve) => {
         resolveFetch = resolve;
       });
-      mockFetch.mockReturnValueOnce(fetchPromise as any);
+      mockFetch.mockReturnValueOnce(fetchPromise as Promise<Response>);
 
       const { result, unmount } = renderHook(() => useAnswerSubmissionPage({ gameId: mockGameId }));
 
@@ -425,7 +433,9 @@ describe('useAnswerSubmissionPage', () => {
 
   describe('Error Priority', () => {
     it('should show fetch error over submission error', async () => {
-      mockFetch.mockReturnValueOnce(createMockResponse({ error: 'フェッチエラー', details: 'フェッチエラー' }, false));
+      mockFetch.mockReturnValueOnce(
+        createMockResponse({ error: 'フェッチエラー', details: 'フェッチエラー' }, false)
+      );
 
       const { result } = renderHook(() => useAnswerSubmissionPage({ gameId: mockGameId }));
 

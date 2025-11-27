@@ -292,7 +292,7 @@ describe('StatusTransitionButton', () => {
     it('should return null for invalid status', () => {
       const invalidProps = {
         ...defaultProps,
-        currentStatus: 'invalid-status' as any,
+        currentStatus: 'invalid-status' as never,
       };
 
       render(
@@ -417,10 +417,13 @@ describe('StatusTransitionButton', () => {
       const button = screen.getByRole('button', { name: /ゲームを開始/i });
       fireEvent.click(button);
 
-      await waitFor(() => {
-        // Button should show success animation state
-        expect(screen.getByText('成功!')).toBeInTheDocument();
-      }, { timeout: 2000 });
+      await waitFor(
+        () => {
+          // Button should show success animation state
+          expect(screen.getByText('成功!')).toBeInTheDocument();
+        },
+        { timeout: 2000 }
+      );
     });
 
     it('should show success state after successful close', async () => {
@@ -441,9 +444,12 @@ describe('StatusTransitionButton', () => {
       const button = screen.getByRole('button', { name: /ゲームを締切/i });
       fireEvent.click(button);
 
-      await waitFor(() => {
-        expect(screen.getByText('成功!')).toBeInTheDocument();
-      }, { timeout: 2000 });
+      await waitFor(
+        () => {
+          expect(screen.getByText('成功!')).toBeInTheDocument();
+        },
+        { timeout: 2000 }
+      );
 
       confirmSpy.mockRestore();
     });
@@ -463,10 +469,13 @@ describe('StatusTransitionButton', () => {
       const button = screen.getByRole('button', { name: /ゲームを開始/i });
       fireEvent.click(button);
 
-      await waitFor(() => {
-        // Button should show error animation state
-        expect(screen.getByText('エラー')).toBeInTheDocument();
-      }, { timeout: 2000 });
+      await waitFor(
+        () => {
+          // Button should show error animation state
+          expect(screen.getByText('エラー')).toBeInTheDocument();
+        },
+        { timeout: 2000 }
+      );
     });
 
     it('should show error state after failed close', async () => {
@@ -490,9 +499,12 @@ describe('StatusTransitionButton', () => {
       const button = screen.getByRole('button', { name: /ゲームを締切/i });
       fireEvent.click(button);
 
-      await waitFor(() => {
-        expect(screen.getByText('エラー')).toBeInTheDocument();
-      }, { timeout: 2000 });
+      await waitFor(
+        () => {
+          expect(screen.getByText('エラー')).toBeInTheDocument();
+        },
+        { timeout: 2000 }
+      );
 
       confirmSpy.mockRestore();
     });
@@ -828,7 +840,7 @@ describe('StatusTransitionButtonCompact', () => {
     it('should return null for invalid status in compact mode', () => {
       const invalidProps = {
         ...defaultProps,
-        currentStatus: 'invalid-status' as any,
+        currentStatus: 'invalid-status' as never,
       };
 
       render(

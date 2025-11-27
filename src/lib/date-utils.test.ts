@@ -6,7 +6,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { formatRelativeTime, formatFullDate } from './date-utils';
+import { formatFullDate, formatRelativeTime } from './date-utils';
 
 describe('formatRelativeTime', () => {
   beforeEach(() => {

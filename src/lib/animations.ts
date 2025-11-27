@@ -220,6 +220,7 @@ export const animationSequences = {
  */
 
 export interface ConfettiParticle {
+  id: number;
   x: number;
   y: number;
   rotation: number;
@@ -237,6 +238,7 @@ export function generateConfettiParticles(count: number): ConfettiParticle[] {
 
   for (let i = 0; i < count; i++) {
     particles.push({
+      id: i,
       x: Math.random() * 100,
       y: -10,
       rotation: Math.random() * 360,

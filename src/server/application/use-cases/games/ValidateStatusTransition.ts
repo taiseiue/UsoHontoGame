@@ -6,6 +6,7 @@
  * Implements all business rules for status transitions as defined in data-model.md.
  */
 
+import type { Game } from '../../../domain/entities/Game';
 import { NotFoundError } from '../../../domain/errors/NotFoundError';
 import {
   StatusTransitionError,
@@ -100,7 +101,7 @@ export class ValidateStatusTransition {
    * Validates specific transition business rules
    */
   private async validateTransitionRules(
-    game: any,
+    game: Game,
     targetStatus: GameStatusValue,
     errors: ValidationResult['errors']
   ): Promise<void> {

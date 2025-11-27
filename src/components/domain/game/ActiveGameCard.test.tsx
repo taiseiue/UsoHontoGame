@@ -131,7 +131,7 @@ describe('ActiveGameCard', () => {
         { formatted: '3日前', testId: 'game-010' },
       ];
 
-      timeFormats.forEach(({ formatted, testId }) => {
+      for (const { formatted, testId } of timeFormats) {
         const game: ActiveGameListItem = {
           id: testId,
           title: `${formatted}のゲーム`,
@@ -146,7 +146,7 @@ describe('ActiveGameCard', () => {
         const { unmount } = render(<ActiveGameCard game={game} />);
         expect(screen.getByText(formatted)).toBeInTheDocument();
         unmount();
-      });
+      }
     });
   });
 
@@ -219,7 +219,7 @@ describe('ActiveGameCard', () => {
         { id: 'xyz789ghi012', expectedHref: '/games/xyz789ghi012/answer' },
       ];
 
-      testCases.forEach(({ id, expectedHref }) => {
+      for (const { id, expectedHref } of testCases) {
         const game: ActiveGameListItem = {
           id,
           title: 'テストゲーム',
@@ -235,7 +235,7 @@ describe('ActiveGameCard', () => {
         const answerLink = screen.getByRole('link', { name: '回答する' });
         expect(answerLink).toHaveAttribute('href', expectedHref);
         unmount();
-      });
+      }
     });
   });
 
@@ -321,7 +321,7 @@ describe('ActiveGameCard', () => {
         },
       ];
 
-      testCases.forEach(({ id, status, expectedText, expectedHref }) => {
+      for (const { id, status, expectedText, expectedHref } of testCases) {
         const game: ActiveGameListItem = {
           id,
           title: `テストゲーム ${status}`,
@@ -337,7 +337,7 @@ describe('ActiveGameCard', () => {
         const link = screen.getByRole('link', { name: expectedText });
         expect(link).toHaveAttribute('href', expectedHref);
         unmount();
-      });
+      }
     });
   });
 

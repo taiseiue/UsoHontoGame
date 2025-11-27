@@ -102,7 +102,9 @@ export function GameDetailPage({ game, currentSessionId }: GameDetailPageProps) 
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
+                aria-label="読み込み中"
               >
+                <title>読み込み中</title>
                 <circle
                   className="opacity-25"
                   cx="12"
@@ -147,7 +149,9 @@ export function GameDetailPage({ game, currentSessionId }: GameDetailPageProps) 
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
+                      aria-label="更新中"
                     >
+                      <title>更新中</title>
                       <circle
                         className="opacity-25"
                         cx="12"
