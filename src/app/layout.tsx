@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { LanguageProvider } from '@/providers/LanguageProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
 import './globals.css';
 
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className="antialiased">
-        <QueryProvider>{children}</QueryProvider>
+        <LanguageProvider>
+          <QueryProvider>{children}</QueryProvider>
+        </LanguageProvider>
       </body>
     </html>
   );
