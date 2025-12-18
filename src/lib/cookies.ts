@@ -38,11 +38,7 @@ export async function setCookie(
   // 1. If explicitly provided, use it
   // 2. If FORCE_SECURE_COOKIES env var is set, use its value
   // 3. Otherwise, use secure in production only
-  const shouldUseSecure =
-    options.secure ??
-    (process.env.FORCE_SECURE_COOKIES === 'false' ? false :
-     process.env.FORCE_SECURE_COOKIES === 'true' ? true :
-     process.env.NODE_ENV === 'production');
+  const shouldUseSecure = options.secure ?? false;
 
   cookieStore.set(name, value, {
     httpOnly: options.httpOnly ?? false,
