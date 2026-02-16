@@ -235,6 +235,27 @@ export class Game {
   }
 
   /**
+   * Updates the game name
+   * Can only be done when in preparation status
+   * @param newName New game name (optional, max 100 chars, nullable)
+   * @throws ValidationError if name is invalid (empty string or > 100 chars)
+   */
+  updateName(newName: string | null): void {
+    // Validate name if provided
+    if (newName !== null) {
+      if (newName.trim() === '') {
+        throw new ValidationError('Game name cannot be empty');
+      }
+      if (newName.length > 100) {
+        throw new ValidationError('Game name must be 100 characters or less');
+      }
+    }
+
+    this._name = newName;
+    this._updatedAt = new Date();
+  }
+
+  /**
    * Transitions game from 準備中 to 出題中 (FR-001)
    * @throws InvalidStatusTransitionError if not in 準備中 status
    */

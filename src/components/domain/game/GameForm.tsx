@@ -12,6 +12,8 @@ interface GameFormProps {
   mode?: 'create' | 'edit';
   /** Game ID (required for edit mode) */
   gameId?: string;
+  /** Initial game name (for edit mode) */
+  initialName?: string | null;
   /** Initial player limit value (for edit mode) */
   initialPlayerLimit?: number;
   /** Current number of players (for edit mode validation hint) */
@@ -26,6 +28,7 @@ interface GameFormProps {
 export function GameForm({
   mode = 'create',
   gameId,
+  initialName = null,
   initialPlayerLimit = 10,
   currentPlayers = 0,
 }: GameFormProps) {
@@ -66,6 +69,7 @@ export function GameForm({
             id="name"
             name="name"
             maxLength={100}
+            defaultValue={initialName || ''}
             placeholder={t('form.game.name.placeholder')}
             disabled={isSubmitting || isSuccess}
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"

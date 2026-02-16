@@ -233,6 +233,7 @@ export function GameDetailPage({ game, currentSessionId }: GameDetailPageProps) 
               <GameForm
                 mode="edit"
                 gameId={game.id}
+                initialName={game.name}
                 initialPlayerLimit={game.maxPlayers}
                 currentPlayers={game.currentPlayers}
               />

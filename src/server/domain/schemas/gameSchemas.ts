@@ -25,6 +25,7 @@ export const CreateGameSchema = z.object({
 
 export const UpdateGameSchema = z.object({
   gameId: GameIdSchema,
+  name: z.string().max(100, { message: 'GAME_NAME_TOO_LONG' }).nullable().optional(),
   playerLimit: z.number().int().min(1).max(100).optional(),
 });
 

@@ -35,6 +35,8 @@ export interface GameDetailDto {
 export interface UpdateGameSettingsInput {
   /** Game ID to update */
   gameId: string;
+  /** New game name (optional, max 100 chars, nullable) */
+  name?: string | null;
   /** New player limit (1-100) */
   playerLimit?: number;
   /** Session ID of the requester (for authorization) */

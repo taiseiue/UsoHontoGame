@@ -27,7 +27,7 @@ export class UpdateGameSettings {
   constructor(private readonly gameRepository: IGameRepository) {}
 
   async execute(input: UpdateGameSettingsInput): Promise<UpdateGameSettingsOutput> {
-    const { gameId, playerLimit, requesterId } = input;
+    const { gameId, name, playerLimit, requesterId } = input;
 
     // Find game
     const game = await this.gameRepository.findById(new GameId(gameId));
@@ -44,6 +44,17 @@ export class UpdateGameSettings {
     // Can only edit when in preparation status
     if (game.status.toString() !== '準備中') {
       throw new ValidationError('ゲームの設定を変更できるのは準備中のみです');
+    }
+
+    // Update game name if provided
+    if (name !== undefined) {
+      // Validate name length (max 100 chars)
+      if (name !== null && name.length > 100) {
+        throw new ValidationError('ゲーム名は100文字以内で指定してください');
+      }
+
+      // Update via entity method
+      game.updateName(name);
     }
 
     // Update player limit if provided

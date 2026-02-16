@@ -322,8 +322,10 @@ export async function updateGameAction(
 > {
   try {
     // Extract and parse form data
+    const gameName = formData.get('name');
     const rawData = {
       gameId: formData.get('gameId') as string,
+      name: gameName === '' ? null : (gameName?.toString() ?? undefined),
       playerLimit: formData.get('playerLimit') ? Number(formData.get('playerLimit')) : undefined,
     };
 
@@ -355,6 +357,7 @@ export async function updateGameAction(
 
     const result = await useCase.execute({
       gameId: validationResult.data.gameId,
+      name: validationResult.data.name,
       playerLimit: validationResult.data.playerLimit,
       requesterId: sessionId,
     });

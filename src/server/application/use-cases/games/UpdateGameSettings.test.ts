@@ -295,4 +295,158 @@ describe('UpdateGameSettings', () => {
     // Then: updatedAt should be more recent
     expect(result.game?.updatedAt.getTime()).toBeGreaterThan(originalDate.getTime());
   });
+
+  // Game Name Update Tests
+  describe('Game Name Updates', () => {
+    it('should update game name for game in preparation status', async () => {
+      // Given: Game in preparation status with original name
+      const gameId = '550e8400-e29b-41d4-a716-446655440001';
+      const game = new Game(
+        new GameId(gameId),
+        'Original Game Name',
+        new GameStatus('準備中'),
+        10,
+        0,
+        new Date(),
+        new Date(),
+        creatorId
+      );
+      await repository.create(game);
+
+      // When: Update game name
+      const result = await useCase.execute({
+        gameId,
+        name: 'Updated Game Name',
+        requesterId: creatorId,
+      });
+
+      // Then: Should update successfully
+      expect(result.success).toBe(true);
+      expect(result.game?.name).toBe('Updated Game Name');
+
+      const updatedGame = await repository.findById(new GameId(gameId));
+      expect(updatedGame?.name).toBe('Updated Game Name');
+    });
+
+    it('should update both name and player limit simultaneously', async () => {
+      // Given: Game in preparation status
+      const gameId = '550e8400-e29b-41d4-a716-446655440001';
+      const game = new Game(
+        new GameId(gameId),
+        'Original Name',
+        new GameStatus('準備中'),
+        10,
+        0,
+        new Date(),
+        new Date(),
+        creatorId
+      );
+      await repository.create(game);
+
+      // When: Update both name and player limit
+      const result = await useCase.execute({
+        gameId,
+        name: 'New Name',
+        playerLimit: 20,
+        requesterId: creatorId,
+      });
+
+      // Then: Should update both successfully
+      expect(result.success).toBe(true);
+      expect(result.game?.name).toBe('New Name');
+      expect(result.game?.maxPlayers).toBe(20);
+
+      const updatedGame = await repository.findById(new GameId(gameId));
+      expect(updatedGame?.name).toBe('New Name');
+      expect(updatedGame?.maxPlayers).toBe(20);
+    });
+
+    it('should allow setting name to null (optional field)', async () => {
+      // Given: Game with a name
+      const gameId = '550e8400-e29b-41d4-a716-446655440001';
+      const game = new Game(
+        new GameId(gameId),
+        'Has a Name',
+        new GameStatus('準備中'),
+        10,
+        0,
+        new Date(),
+        new Date(),
+        creatorId
+      );
+      await repository.create(game);
+
+      // When: Update name to null
+      const result = await useCase.execute({
+        gameId,
+        name: null,
+        requesterId: creatorId,
+      });
+
+      // Then: Should update successfully
+      expect(result.success).toBe(true);
+      expect(result.game?.name).toBeNull();
+
+      const updatedGame = await repository.findById(new GameId(gameId));
+      expect(updatedGame?.name).toBeNull();
+    });
+
+    it('should throw ValidationError if name exceeds 100 characters', async () => {
+      // Given: Game in preparation
+      const gameId = '550e8400-e29b-41d4-a716-446655440001';
+      const game = new Game(
+        new GameId(gameId),
+        'Original Name',
+        new GameStatus('準備中'),
+        10,
+        0,
+        new Date(),
+        new Date(),
+        creatorId
+      );
+      await repository.create(game);
+
+      // When/Then: Should throw ValidationError for name > 100 chars
+      const longName = 'a'.repeat(101);
+      await expect(
+        useCase.execute({
+          gameId,
+          name: longName,
+          requesterId: creatorId,
+        })
+      ).rejects.toThrow(ValidationError);
+    });
+
+    it('should update only name when playerLimit is not provided', async () => {
+      // Given: Game with original settings
+      const gameId = '550e8400-e29b-41d4-a716-446655440001';
+      const game = new Game(
+        new GameId(gameId),
+        'Original Name',
+        new GameStatus('準備中'),
+        10,
+        0,
+        new Date(),
+        new Date(),
+        creatorId
+      );
+      await repository.create(game);
+
+      // When: Update only name
+      const result = await useCase.execute({
+        gameId,
+        name: 'Only Name Changed',
+        requesterId: creatorId,
+      });
+
+      // Then: Should update name but keep playerLimit unchanged
+      expect(result.success).toBe(true);
+      expect(result.game?.name).toBe('Only Name Changed');
+      expect(result.game?.maxPlayers).toBe(10);
+
+      const updatedGame = await repository.findById(new GameId(gameId));
+      expect(updatedGame?.name).toBe('Only Name Changed');
+      expect(updatedGame?.maxPlayers).toBe(10);
+    });
+  });
 });
