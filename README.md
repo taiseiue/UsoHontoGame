@@ -1,300 +1,214 @@
 # UsoHontoGame (ウソホント)
 
-A truth-or-lie guessing game built with Next.js 16, React 19, and SQLite. Players try to identify which episode among three presented stories is false.
+Next.js 16、React 19、SQLiteを使った真偽判定ゲーム。プレイヤーは3つのエピソードの中から嘘のエピソードを当てます。
 
-## Features
+## クイックスタート
 
-### Implemented
-
-- **Session Management**
-  - Cookie-based authentication
-  - Nickname registration
-  - Persistent sessions
-
-- **Game Preparation (Moderator)**
-  - Create games with configurable player limits (1-100)
-  - View and manage game list
-  - Edit game settings (during preparation phase)
-  - Delete games with cascade deletion
-  - Game status management (準備中/出題中/締切)
-  - SQLite persistence with automatic migrations
-
-### In Development
-
-- [ ] **Presenter Management**
-  - Add presenters to games (1-10 per game)
-  - Register 3 episodes per presenter
-  - Mark one episode as lie (confidential)
-
-- [ ] **Player Experience**
-  - Join active games
-  - View and vote on episodes
-  - See voting results
-
-## Tech Stack
-
-### Core
-
-- **Framework**: Next.js 16.0.1 (App Router)
-- **Language**: TypeScript 5 (strict mode)
-- **UI Library**: React 19.2.0
-- **Styling**: Tailwind CSS v4
-
-### Data & Persistence
-
-- **Database**: SQLite (via Prisma)
-- **ORM**: Prisma 6.19.0
-- **Validation**: Zod 4.1.12
-- **ID Generation**: nanoid 5.1.6
-
-### Testing
-
-- **Unit Tests**: Vitest 4.0.7
-- **E2E Tests**: Playwright 1.56.1
-- **Component Testing**: Testing Library
-
-⚠️ **Known Issue**: Tests are currently failing due to lack of maintenance.
-
-### Code Quality
-
-- **Linting**: Biome 2.3.4, ESLint 9
-- **Formatting**: Biome
-
-## Architecture
-
-This project follows **Clean Architecture** principles with **Domain-Driven Design**:
-
-```
-src/
-├── app/                    # Next.js pages (Presentation Layer)
-├── components/             # React components (Presentation Layer)
-└── server/
-    ├── application/        # Use Cases (Application Layer)
-    ├── domain/             # Entities, Value Objects (Domain Layer)
-    └── infrastructure/     # Database, External APIs (Infrastructure Layer)
-```
-
-**Key Design Patterns**:
-
-- Repository Pattern (abstraction over data access)
-- Server Actions (Next.js mutation API)
-- Value Objects (domain validation)
-- Use Case Pattern (application logic)
-
-## Getting Started
-
-### Prerequisites
+### 前提条件
 
 - Node.js 20+
-- npm or yarn
+- npm
 
-### Installation
+### インストールと起動
 
 ```bash
-# Install dependencies
+# リポジトリをクローン（または既存のディレクトリで）
 npm install
 
-# Set up environment variables for Prisma CLI
-# This creates .env with relative path to database
+# 環境変数を設定
 echo "DATABASE_URL=\"file:./dev.db\"" > .env
-
-# Set up environment variables for Next.js
-# This creates .env.local with absolute path to database
 echo "DATABASE_URL=\"file:$(pwd)/prisma/dev.db\"" > .env.local
 
-# Set up database
+# データベースをセットアップ
 npx prisma migrate dev
-
-# Generate Prisma Client
 npx prisma generate
-```
 
-**Note**: The `.env` file contains relative path for Prisma CLI, while `.env.local` contains absolute path for Next.js runtime. Both are needed for the application to work correctly.
-
-### Development
-
-```bash
-# Start development server
+# 開発サーバーを起動
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000)
+[http://localhost:3000](http://localhost:3000)にアクセスしてください。
 
-### Understanding the Application
+### 初回アクセス時
 
-This application has two distinct entry points:
+1. ニックネームを登録（Cookieに保存）
+2. セッションが自動的に作成されます
 
-**Player View** (`/`)
-- For participants joining games
-- Shows only active games (status: 出題中)
-- Join games, view presenters, and vote on episodes
+### 2つのエントリーポイント
 
-**Moderator View** (`/games`)
-- For game creators/moderators
-- Shows only games you created (filtered by your session ID)
-- Create, edit, and manage your games
+- **プレイヤービュー** (`/`): 公開中のゲームに参加
+- **モデレータービュー** (`/games`): 自分のゲームを管理
 
-**Note**: There are no navigation buttons between these views. Access them directly via URL.
+⚠️ ナビゲーションボタンはありません。URLを直接入力してください。
 
-#### Session Management
+## ゲームの流れ
 
-Sessions are managed via browser cookies:
-- `sessionId`: Unique identifier for your session (generated with nanoid)
-- `nickname`: Your display name
+### モデレーター（ゲーム作成者）
 
-On first visit, you'll be prompted to register a nickname, which creates a persistent session.
+1. **ゲーム一覧を確認** → `/games`
+   - 自分のゲーム一覧を表示
+   - 「ゲーム作成」ボタンから新規作成
 
-#### Game Flow
+2. **ゲーム作成** → `/games/create`
+   - ゲーム名、プレイヤー上限（1-100人）を設定
+   - ステータス：**準備中**
 
-Games have three statuses:
-- **準備中** (Preparing): Initial state, moderator setting up presenters/episodes
-- **出題中** (Active): Game is live, players can join and vote
-- **締切** (Closed): Voting ended, results available
+3. **出題者とエピソード登録** → `/games/[id]/presenters`
+   - 出題者を追加（1-10人）
+   - 各出題者につき3つのエピソードを登録
+   - 1つのエピソードを「嘘」としてマーク（プレイヤーには非公開）
 
-Each game contains:
-- 1-10 presenters per game
-- 3 episodes per presenter
-- Exactly 1 lie among the 3 episodes (hidden from players)
+4. **ゲーム公開** → `/games/[id]`
+   - ステータスを**出題中**に変更
+   - プレイヤーが参加可能になる
 
-### Database Management
+5. **進行管理** → `/games/[id]/dashboard`
+   - リアルタイムで回答状況を確認
+   - 参加者一覧と回答状況
 
-```bash
-# Create a new migration
-npx prisma migrate dev --name your_migration_name
+6. **ゲーム終了** → `/games/[id]`
+   - ステータスを**締切**に変更
+   - 結果を公開
 
-# Open Prisma Studio (GUI for database)
-npx prisma studio
+### プレイヤー
 
-# Reset database (WARNING: deletes all data)
-npx prisma migrate reset
+1. **ゲーム発見** → `/`
+   - 「出題中」のゲーム一覧を表示
+
+2. **投票** → `/games/[id]/answer`
+   - 各出題者の3つのエピソードを閲覧
+   - 「嘘だと思うエピソード」を選択
+   - 回答を送信
+
+3. **結果確認** → `/games/[id]/results`
+   - 正解数ランキング
+   - 勝者の表彰
+
+## 実装済み機能
+
+### セッション管理
+- Cookieベースの認証
+- ニックネーム登録
+- 永続的なセッション
+
+### モデレーター機能
+- ゲームの作成・編集・削除
+- 出題者とエピソードの登録
+- ゲームステータス管理（準備中 → 出題中 → 締切）
+- リアルタイムダッシュボード
+
+### プレイヤー機能
+- アクティブなゲーム一覧の表示
+- ゲーム参加と投票
+- 結果表示とランキング
+
+### その他
+- 多言語対応（日本語・英語）
+- SQLite永続化
+- 自動マイグレーション
+
+---
+
+## 開発者向け情報
+
+### 技術スタック
+
+#### コア
+- **フレームワーク**: Next.js 16.0.1 (App Router)
+- **言語**: TypeScript 5 (strictモード)
+- **UIライブラリ**: React 19.2.0
+- **スタイリング**: Tailwind CSS v4
+
+#### データ・永続化
+- **データベース**: SQLite (Prisma経由)
+- **ORM**: Prisma 6.19.0
+- **バリデーション**: Zod 4.1.12
+- **ID生成**: nanoid 5.1.6
+
+#### テスト
+- **ユニットテスト**: Vitest 4.0.7
+- **E2Eテスト**: Playwright 1.56.1
+- **コンポーネントテスト**: Testing Library
+
+⚠️ **注意**: 多くのテストが現在失敗します。テストファイルは現在メンテナンスされていません。
+
+#### コード品質
+- **リント・フォーマット**: Biome 2.3.4、ESLint 9
+
+### アーキテクチャ
+
+**クリーンアーキテクチャ** + **ドメイン駆動設計**
+
+```
+src/
+├── app/                    # Next.jsページ（プレゼンテーション層）
+├── components/             # Reactコンポーネント（プレゼンテーション層）
+└── server/
+    ├── application/        # ユースケース（アプリケーション層）
+    ├── domain/             # エンティティ、値オブジェクト（ドメイン層）
+    └── infrastructure/     # データベース、外部API（インフラ層）
 ```
 
-## Available Scripts
+**主要パターン**:
+- リポジトリパターン
+- サーバーアクション（Next.js）
+- 値オブジェクト
+- ユースケースパターン
 
-### Development
-
-```bash
-npm run dev          # Start dev server at localhost:3000
-npm run build        # Build for production
-npm start            # Start production server
-```
-
-### Testing
-⚠️ **Known Issue**: Tests are currently failing due to lack of maintenance.
-```bash
-npm test                   # Run unit tests with Vitest
-npm run test:ui            # Run tests with interactive UI
-npm run test:coverage      # Generate coverage report
-npm run test:e2e           # Run E2E tests with Playwright
-npm run test:e2e:ui        # Run E2E tests with UI
-npm run test:e2e:debug     # Debug E2E tests
-```
-
-### Code Quality
-
-```bash
-npm run lint               # Lint with ESLint
-npm run lint:biome         # Lint with Biome
-npm run format             # Format code with Biome
-npm run format:check       # Check formatting
-npm run check              # Lint + format with Biome
-```
-
-### Database
-
-```bash
-npx prisma migrate dev     # Run migrations (dev)
-npx prisma migrate deploy  # Run migrations (production)
-npx prisma studio          # Open database GUI
-npx prisma generate        # Generate Prisma Client
-```
-
-#### Seed Scripts
-
-Two seed scripts are available for generating test data:
-
-**1. Global Seed (`npm run seed`)**
-```bash
-npm run seed
-```
-- Creates 150 games total (50 per status)
-- Uses a fixed creator ID: `seed-creator-session-id`
-- **Clears ALL existing data** before seeding
-- Useful for: Fresh start, testing across all statuses
-
-**2. User-Specific Seed (`npm run seed:my <session-id>`)**
-```bash
-npm run seed:my wDTbv1VX6IqHNmPgqbCX-
-```
-- Creates ~100 games for specified session ID
-- Deletes only games from that session
-- Preserves other users' games
-- Useful for: Testing `/games` page with many items
-
-**Getting Your Session ID:**
-1. Open DevTools (F12)
-2. Go to Application → Cookies → http://localhost:3000
-3. Copy the value of `sessionId` cookie
-
-## Project Structure
+### プロジェクト構造
 
 ```
 .
 ├── src/
 │   ├── app/                        # Next.js App Router
-│   │   ├── actions/                # Server Actions (API)
-│   │   ├── games/                  # Game pages
-│   │   │   ├── page.tsx            # Game list
-│   │   │   ├── create/             # Game creation
-│   │   │   └── [id]/               # Game detail/edit
-│   │   └── page.tsx                # Home (session)
+│   │   ├── actions/                # サーバーアクション
+│   │   ├── api/                    # APIルート
+│   │   ├── games/                  # ゲームページ
+│   │   │   ├── [id]/
+│   │   │   │   ├── answer/         # 回答送信ページ
+│   │   │   │   ├── dashboard/      # ダッシュボード
+│   │   │   │   ├── presenters/     # 出題者管理
+│   │   │   │   └── results/        # 結果表示
+│   │   │   ├── create/             # ゲーム作成
+│   │   │   └── page.tsx            # ゲーム一覧
+│   │   └── page.tsx                # TOP（セッション）
 │   ├── components/
-│   │   ├── domain/                 # Domain components
-│   │   │   ├── game/               # Game UI components
-│   │   │   └── session/            # Session UI components
-│   │   ├── pages/                  # Page components
-│   │   └── ui/                     # Reusable UI
-│   ├── hooks/                      # Custom React hooks
-│   ├── lib/                        # Utilities
+│   │   ├── domain/                 # ドメインコンポーネント
+│   │   ├── pages/                  # ページコンポーネント
+│   │   └── ui/                     # 再利用可能なUI
+│   ├── hooks/                      # カスタムReactフック
+│   ├── lib/                        # ユーティリティ
 │   ├── server/
-│   │   ├── application/            # Use Cases & DTOs
-│   │   │   ├── dto/                # Data Transfer Objects
-│   │   │   └── use-cases/          # Business logic
-│   │   ├── domain/                 # Domain layer
-│   │   │   ├── entities/           # Domain entities
-│   │   │   ├── errors/             # Domain errors
-│   │   │   ├── repositories/       # Repository interfaces
-│   │   │   ├── schemas/            # Zod validation schemas
-│   │   │   └── value-objects/      # Value objects
-│   │   └── infrastructure/         # External dependencies
-│   │       └── repositories/       # Repository implementations
-│   └── types/                      # TypeScript types
+│   │   ├── application/            # ユースケース・DTO
+│   │   ├── domain/                 # ドメイン層
+│   │   └── infrastructure/         # 外部依存関係
+│   └── types/                      # TypeScript型定義
 ├── tests/
-│   ├── e2e/                        # Playwright E2E tests
-│   ├── integration/                # Integration tests
-│   └── unit/                       # Vitest unit tests
+│   ├── e2e/                        # Playwright E2Eテスト
+│   ├── integration/                # 統合テスト
+│   └── utils/                      # テストユーティリティ
 ├── prisma/
-│   ├── schema.prisma               # Database schema
-│   ├── migrations/                 # Migration files
-│   └── dev.db                      # SQLite database
-└── specs/                          # Feature specifications
+│   ├── schema.prisma               # データベーススキーマ
+│   ├── migrations/                 # マイグレーションファイル
+│   └── dev.db                      # SQLiteデータベース
+└── specs/                          # 機能仕様
 ```
 
-## Database Schema
-
-Current schema (as of 2025-11-11):
+### データベーススキーマ
 
 ```prisma
 model Game {
-  id             String      @id @default(uuid())
-  name           String
-  creatorId      String
-  maxPlayers     Int
-  currentPlayers Int         @default(0)
-  status         String      @default("準備中")
-  presenters     Presenter[]
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  id              String          @id @default(uuid())
+  name            String?
+  creatorId       String
+  maxPlayers      Int
+  currentPlayers  Int             @default(0)
+  status          String          @default("準備中")
+  presenters      Presenter[]
+  answers         Answer[]
+  participations  Participation[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 }
 
 model Presenter {
@@ -314,136 +228,171 @@ model Episode {
   presenter   Presenter @relation(fields: [presenterId], references: [id], onDelete: Cascade)
   createdAt   DateTime  @default(now())
 }
+
+model Answer {
+  id         String   @id @default(uuid())
+  sessionId  String
+  gameId     String
+  nickname   String
+  selections Json
+  game       Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([sessionId, gameId])
+}
+
+model Participation {
+  id        String   @id @default(uuid())
+  sessionId String
+  gameId    String
+  nickname  String
+  joinedAt  DateTime @default(now())
+  game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, gameId])
+}
 ```
 
-## Testing
+## 開発ガイド
 
-### Unit Tests (Vitest)
+### 利用可能なコマンド
+
+#### 開発
+```bash
+npm run dev          # 開発サーバー起動
+npm run build        # 本番ビルド
+npm start            # 本番サーバー起動
+```
+
+#### テスト
+```bash
+npm test                   # すべてのテストを実行
+npm run test:unit          # ユニットテストのみ
+npm run test:integration   # 統合テストのみ
+npm run test:ui            # インタラクティブUI
+npm run test:coverage      # カバレッジレポート
+npm run test:e2e           # E2Eテスト
+npm run test:e2e:ui        # E2EテストUI
+npm run test:e2e:debug     # E2Eデバッグ
+```
+
+#### データベース
+```bash
+npx prisma migrate dev     # マイグレーション実行（開発）
+npx prisma migrate deploy  # マイグレーション実行（本番）
+npx prisma studio          # データベースGUI
+npx prisma generate        # Prismaクライアント生成
+```
+
+#### シードスクリプト（テストデータ生成）
+```bash
+# グローバルシード：データベース全体をリセットして新規データを作成
+npm run seed
+# - すべての既存データを削除
+# - 固定の作成者ID（seed-creator-session-id）で150ゲーム作成
+# - 各ステータス（準備中/出題中/締切）50ゲームずつ
+# - 用途：初期状態に戻したい時、全ステータスのテスト
+
+# ユーザー固有シード：自分のセッションでテストデータを作成
+npm run seed:my <session-id>
+# - 指定セッションIDの既存ゲームのみを削除
+# - そのセッションIDで約100ゲーム作成
+# - 他のユーザーのゲームは保持される
+# - 用途：/gamesページで大量データをテスト
+```
+
+#### コード品質
+```bash
+npm run lint               # ESLintでリント
+npm run lint:biome         # Biomeでリント
+npm run format             # Biomeでフォーマット
+npm run format:check       # フォーマットチェック
+npm run check              # リント＋フォーマット
+```
+
+### 開発のヒント
+
+#### セッションIDの確認方法
+
+1. DevTools（F12）を開く
+2. Application → Cookies → `http://localhost:3000`
+3. `sessionId` Cookieの値をコピー
+
+**用途:**
+- `npm run seed:my <session-id>` でテストデータ生成
+- セッション固有の問題をデバッグ
+
+#### 複数ユーザーのテスト
+
+- **通常のブラウザ**: ユーザーA
+- **シークレットモード**: ユーザーB
+
+各ブラウザで独立したセッションを作成できます。
 
 ```bash
-# Run all unit tests
-npm test
+# ターミナル1: ユーザーAのゲームをシード
+npm run seed:my <session-id-A>
 
-# Run specific test file
-npm test tests/unit/use-cases/CreateGame.test.ts
-
-# Watch mode
-npm test -- --watch
-
-# Coverage report
-npm run test:coverage
+# ターミナル2: ユーザーBのゲームをシード
+npm run seed:my <session-id-B>
 ```
 
-### E2E Tests (Playwright)
+### 開発ワークフロー
+
+#### データベース変更
+1. `prisma/schema.prisma`を更新
+2. マイグレーション作成: `npx prisma migrate dev --name description`
+3. リポジトリ実装を更新
+4. ドメインエンティティを更新（必要に応じて）
+
+### 開発のヒント
+
+#### セッションIDの確認方法
+
+1. DevTools（F12）を開く
+2. Application → Cookies → `http://localhost:3000`
+3. `sessionId` Cookieの値をコピー
+
+**用途:**
+- `npm run seed:my <session-id>` でテストデータ生成
+- セッション固有の問題をデバッグ
+
+#### 複数ユーザーのテスト
+
+- **通常のブラウザ**: ユーザーA
+- **シークレットモード**: ユーザーB
+
+各ブラウザで独立したセッションを作成できます。
 
 ```bash
-# Run all E2E tests
-npm run test:e2e
+# ターミナル1: ユーザーAのゲームをシード
+npm run seed:my <session-id-A>
 
-# Run with UI
-npm run test:e2e:ui
-
-# Debug mode
-npm run test:e2e:debug
-
-# Run specific test
-npm run test:e2e -- tests/e2e/game-creation.spec.ts
+# ターミナル2: ユーザーBのゲームをシード
+npm run seed:my <session-id-B>
 ```
 
-## Environment Variables
+### 環境変数
 
-Create a `.env` file in the root directory:
-
+`.env`:
 ```env
-# Database
 DATABASE_URL="file:./dev.db"
-
-# Repository Type (optional, defaults to 'prisma')
-# REPOSITORY_TYPE="memory"  # Use in-memory for testing
 ```
 
-## Development Workflow
-
-1. **Feature Development**
-   - Create feature spec in `specs/[feature-number]/spec.md`
-   - Generate implementation plan
-   - Write tests (TDD approach)
-   - Implement feature following Clean Architecture
-   - Run tests and ensure coverage
-
-2. **Database Changes**
-   - Update `prisma/schema.prisma`
-   - Create migration: `npx prisma migrate dev --name description`
-   - Update repository implementations
-   - Update domain entities if needed
-
-3. **Code Quality**
-   - Format: `npm run format`
-   - Lint: `npm run check`
-   - Test: `npm test && npm run test:e2e`
-   - Build: `npm run build`
-
-## Development Tips
-
-### Testing with Multiple Users
-
-To simulate multiple users simultaneously:
-
-1. **Normal Browser**: User A (e.g., session: `abc123`)
-2. **Incognito/Private Mode**: User B (e.g., session: `xyz789`)
-
-Each browser context maintains separate cookies, allowing independent sessions.
-
-**Example Workflow:**
-```bash
-# Terminal 1: Seed games for User A
-npm run seed:my abc123
-
-# Terminal 2: Seed games for User B
-npm run seed:my xyz789
-
-# Browser 1 (normal): Navigate to http://localhost:3000/games
-# Browser 2 (incognito): Navigate to http://localhost:3000/games
-# Each sees only their own games
+`.env.local`:
+```env
+DATABASE_URL="file:/absolute/path/to/prisma/dev.db"
 ```
 
-### Finding Your Session ID
+⚠️ **注意**: 両方のファイルが必要です。
+- `.env`: Prisma CLI用（相対パス）
+- `.env.local`: Next.jsランタイム用（絶対パス）
 
-Your session ID is stored in a browser cookie. To retrieve it:
+## ライセンス
 
-1. Open **DevTools** (F12 or right-click → Inspect)
-2. Navigate to **Application** tab (Chrome/Edge) or **Storage** tab (Firefox)
-3. Expand **Cookies** → `http://localhost:3000`
-4. Find the `sessionId` cookie
-5. Copy its **Value** (e.g., `wDTbv1VX6IqHNmPgqbCX-`)
+プライベートプロジェクト - All rights reserved
 
-**Use Cases:**
-- Generate test data for your session: `npm run seed:my <your-session-id>`
-- Debug session-specific issues
-- Verify session persistence across page reloads
+## 謝辞
 
-### Page Navigation During Development
-
-Since there are no built-in navigation buttons between player and moderator views:
-
-- **Player View**: `http://localhost:3000/`
-- **Moderator View**: `http://localhost:3000/games`
-
-Bookmark both URLs or type them directly in the address bar.
-
-## Contributing
-
-This project follows:
-
-- **Clean Architecture** for separation of concerns
-- **Domain-Driven Design** for business logic
-- **Repository Pattern** for data access abstraction
-- **Test-Driven Development** for quality assurance
-
-## License
-
-Private project - All rights reserved
-
-## Acknowledgments
-
-Built with [Claude Code](https://claude.ai/code)
+[Claude Code](https://claude.ai/code)を使用して構築されました
