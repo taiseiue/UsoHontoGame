@@ -1,41 +1,31 @@
 'use server';
 
 // Answer Submission Server Actions
-// Feature: 001-lie-detection-answers
+// Feature: 001-lie-detection-answers, Server Actions リファクタリング - Phase 4
 // Server Actions with Zod validation for answer submission
+// Refactored to use AnswerApplicationService
 
 import { t } from '@/lib/i18n/server';
 import type { GetGameForAnswersResponse } from '@/server/application/use-cases/answers/GetGameForAnswers';
-import { GetGameForAnswers } from '@/server/application/use-cases/answers/GetGameForAnswers';
-import { SubmitAnswer } from '@/server/application/use-cases/answers/SubmitAnswer';
-import { ValidateSession } from '@/server/application/use-cases/session/ValidateSession';
+import { AnswerApplicationService } from '@/server/application/services/AnswerApplicationService';
 import { SubmitAnswerSchema } from '@/server/domain/schemas/answerSchemas';
-import { SessionServiceContainer } from '@/server/infrastructure/di/SessionServiceContainer';
-import {
-  createAnswerRepository,
-  createGameRepository,
-  createParticipationRepository,
-} from '@/server/infrastructure/repositories';
-import { CookieSessionRepository } from '@/server/infrastructure/repositories/CookieSessionRepository';
 
-// Create session repository instance for session validation
-const sessionRepository = new CookieSessionRepository();
+// AnswerApplicationService インスタンス（モジュールレベルSingleton）
+const answerService = new AnswerApplicationService();
 
 /**
  * Server Action: Get game data for answer submission page
- * @param gameId - Game ID to retrieve
+ * @param gameId Game ID to retrieve
  * @returns Game data or error response
  */
 export async function getGameForAnswersAction(gameId: string): Promise<GetGameForAnswersResponse> {
-  const gameRepository = createGameRepository();
-  const useCase = new GetGameForAnswers(gameRepository);
-
-  return await useCase.execute(gameId);
+  // Application Service呼び出し
+  return await answerService.getGameForAnswers(gameId);
 }
 
 /**
  * Server Action: Submit answer
- * @param formData - Form data containing gameId and selections
+ * @param formData Form data containing gameId and selections
  * @returns Success response with answerId or validation errors
  */
 export async function submitAnswerAction(
@@ -44,30 +34,7 @@ export async function submitAnswerAction(
   | { success: true; data: { answerId: string; message: string } }
   | { success: false; errors: Record<string, string[]> }
 > {
-  // Get session
-  let sessionId: string;
-  let nickname: string;
-
-  try {
-    const sessionService = SessionServiceContainer.getSessionService();
-    sessionId = await sessionService.requireCurrentSession();
-
-    // Use ValidateSession to get session data with nickname
-    const validateUseCase = new ValidateSession(sessionRepository);
-    const session = await validateUseCase.execute(sessionId);
-
-    // Use nickname if available, otherwise use default name based on sessionId
-    nickname = session?.nickname ?? `参加者_${sessionId.slice(0, 8)}`;
-  } catch {
-    return {
-      success: false,
-      errors: {
-        _form: [await t('action.session.notFound')],
-      },
-    };
-  }
-
-  // Parse form data
+  // 1. FormDataパース
   const gameId = formData.get('gameId') as string;
   const selectionsRaw = formData.get('selections') as string;
 
@@ -83,7 +50,7 @@ export async function submitAnswerAction(
     };
   }
 
-  // Validate input
+  // 2. Zodバリデーション
   const validation = SubmitAnswerSchema.safeParse({
     gameId,
     selections,
@@ -104,33 +71,11 @@ export async function submitAnswerAction(
     };
   }
 
-  // Execute use case
-  const gameRepository = createGameRepository();
-  const answerRepository = createAnswerRepository();
-  const participationRepository = createParticipationRepository();
-
-  const useCase = new SubmitAnswer(answerRepository, participationRepository, gameRepository);
-
-  const result = await useCase.execute({
-    gameId,
-    sessionId,
-    nickname,
-    selections,
+  // 3. Application Service呼び出し
+  const result = await answerService.submitAnswer({
+    gameId: validation.data.gameId,
+    selections: validation.data.selections,
   });
 
-  // Convert use case result to server action result
-  if (result.success) {
-    return {
-      success: true,
-      data: result.data,
-    };
-  }
-
-  // Map error codes to user-friendly messages
-  return {
-    success: false,
-    errors: {
-      _form: [result.error.message],
-    },
-  };
+  return result;
 }
