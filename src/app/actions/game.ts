@@ -7,17 +7,10 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { translateZodError } from '@/lib/i18n/translateZodError';
 import type { GameDetailDto } from '@/server/application/dto/GameDetailDto';
 import type { CreateGameOutput, GameManagementDto } from '@/server/application/dto/GameDto';
 import type { RankingDto } from '@/server/application/dto/RankingDto';
 import { ServiceContainer } from '@/server/infrastructure/di/ServiceContainer';
-import {
-  CloseGameActionSchema,
-  DeleteGameSchema,
-  StartAcceptingSchema,
-  StartGameActionSchema,
-} from '@/server/domain/schemas/gameSchemas';
 
 /**
  * Server Action: Create new game
@@ -77,26 +70,19 @@ export async function createGameAndRedirect(formData: FormData): Promise<void> {
 export async function startAcceptingAction(
   formData: FormData
 ): Promise<{ success: true } | { success: false; errors: Record<string, string[]> }> {
-  // 1. FormDataパース・Zodバリデーション
+  // 1. FormDataパース（型変換のみ）
   const rawData = {
     gameId: formData.get('gameId'),
   };
 
-  const validationResult = StartAcceptingSchema.safeParse(rawData);
-  if (!validationResult.success) {
-    return {
-      success: false,
-      errors: await translateZodError(validationResult.error),
-    };
-  }
-
-  // 2. Application Service呼び出し
-  const result = await ServiceContainer.getGameService().startAcceptingResponses(validationResult.data.gameId);
+  // 2. Application Service呼び出し（バリデーション含む）
+  const result = await ServiceContainer.getGameService().startAcceptingResponses(rawData);
 
   // 3. 成功時のみrevalidatePath
   if (result.success) {
+    const gameId = (rawData.gameId as string) || '';
     revalidatePath('/games');
-    revalidatePath(`/games/${validationResult.data.gameId}`);
+    revalidatePath(`/games/${gameId}`);
   }
 
   return result;
@@ -198,21 +184,13 @@ export async function updateGameAction(
 export async function deleteGameAction(
   formData: FormData
 ): Promise<{ success: true } | { success: false; errors: Record<string, string[]> }> {
-  // 1. FormDataパース・Zodバリデーション
+  // 1. FormDataパース（型変換のみ）
   const rawData = {
     gameId: formData.get('gameId') as string,
   };
 
-  const validationResult = DeleteGameSchema.safeParse(rawData);
-  if (!validationResult.success) {
-    return {
-      success: false,
-      errors: await translateZodError(validationResult.error),
-    };
-  }
-
-  // 2. Application Service呼び出し
-  const result = await ServiceContainer.getGameService().deleteGame(validationResult.data.gameId);
+  // 2. Application Service呼び出し（バリデーション含む）
+  const result = await ServiceContainer.getGameService().deleteGame(rawData);
 
   // 3. 成功時のみrevalidatePath
   if (result.success) {
@@ -233,27 +211,20 @@ export async function deleteGameAction(
 export async function startGameAction(
   formData: FormData
 ): Promise<{ success: true } | { success: false; errors: Record<string, string[]> }> {
-  // 1. FormDataパース・Zodバリデーション
+  // 1. FormDataパース（型変換のみ）
   const rawData = {
     gameId: formData.get('gameId'),
   };
 
-  const validationResult = StartGameActionSchema.safeParse(rawData);
-  if (!validationResult.success) {
-    return {
-      success: false,
-      errors: await translateZodError(validationResult.error),
-    };
-  }
-
-  // 2. Application Service呼び出し
-  const result = await ServiceContainer.getGameService().startGame(validationResult.data.gameId);
+  // 2. Application Service呼び出し（バリデーション含む）
+  const result = await ServiceContainer.getGameService().startGame(rawData);
 
   // 3. 成功時のみrevalidatePath
   if (result.success) {
+    const gameId = (rawData.gameId as string) || '';
     revalidatePath('/games');
-    revalidatePath(`/games/${validationResult.data.gameId}`);
-    revalidatePath(`/games/${validationResult.data.gameId}/presenters`);
+    revalidatePath(`/games/${gameId}`);
+    revalidatePath(`/games/${gameId}/presenters`);
   }
 
   return result;
@@ -269,28 +240,21 @@ export async function startGameAction(
 export async function closeGameAction(
   formData: FormData
 ): Promise<{ success: true } | { success: false; errors: Record<string, string[]> }> {
-  // 1. FormDataパース・Zodバリデーション
+  // 1. FormDataパース（型変換のみ）
   const rawData = {
     gameId: formData.get('gameId'),
     confirmed: formData.get('confirmed') === 'true',
   };
 
-  const validationResult = CloseGameActionSchema.safeParse(rawData);
-  if (!validationResult.success) {
-    return {
-      success: false,
-      errors: await translateZodError(validationResult.error),
-    };
-  }
-
-  // 2. Application Service呼び出し
-  const result = await ServiceContainer.getGameService().closeGame(validationResult.data.gameId);
+  // 2. Application Service呼び出し（バリデーション含む）
+  const result = await ServiceContainer.getGameService().closeGame(rawData);
 
   // 3. 成功時のみrevalidatePath
   if (result.success) {
+    const gameId = (rawData.gameId as string) || '';
     revalidatePath('/games');
-    revalidatePath(`/games/${validationResult.data.gameId}`);
-    revalidatePath(`/games/${validationResult.data.gameId}/presenters`);
+    revalidatePath(`/games/${gameId}`);
+    revalidatePath(`/games/${gameId}/presenters`);
   }
 
   return result;

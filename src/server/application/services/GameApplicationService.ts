@@ -15,7 +15,14 @@ import { CloseGame } from '@/server/application/use-cases/games/CloseGame';
 import { ValidateStatusTransition } from '@/server/application/use-cases/games/ValidateStatusTransition';
 import type { GetActiveGamesResult } from '@/server/application/use-cases/games/GetActiveGames';
 import { GameId } from '@/server/domain/value-objects/GameId';
-import { CreateGameSchema, UpdateGameSchema } from '@/server/domain/schemas/gameSchemas';
+import {
+  CreateGameSchema,
+  UpdateGameSchema,
+  DeleteGameSchema,
+  StartGameActionSchema,
+  CloseGameActionSchema,
+  StartAcceptingSchema,
+} from '@/server/domain/schemas/gameSchemas';
 import type { CreateGameOutput, GameManagementDto } from '@/server/application/dto/GameDto';
 import type { GameDetailDto } from '@/server/application/dto/GameDetailDto';
 import type { ServiceResponse, ServiceVoidResponse } from './types';
@@ -116,23 +123,32 @@ export class GameApplicationService {
   }
 
   /**
-   * ゲーム削除
-   * @param gameId ゲームID
+   * ゲーム削除（バリデーション含む）
+   * @param input 未検証のゲームID
    * @returns 削除成功/失敗
    */
-  async deleteGame(gameId: string): Promise<ServiceVoidResponse> {
+  async deleteGame(input: unknown): Promise<ServiceVoidResponse> {
+    // 1. Zodバリデーション
+    const validationResult = DeleteGameSchema.safeParse(input);
+    if (!validationResult.success) {
+      return {
+        success: false,
+        errors: await translateZodError(validationResult.error),
+      };
+    }
+
     try {
-      // 1. セッション取得
+      // 2. セッション取得
       const sessionService = SessionServiceContainer.getSessionService();
       const sessionId = await sessionService.requireCurrentSession();
 
-      // 2. リポジトリ・UseCase準備
+      // 3. リポジトリ・UseCase準備
       const repository = createGameRepository();
       const useCase = new DeleteGame(repository);
 
-      // 3. UseCase実行
+      // 4. UseCase実行
       await useCase.execute({
-        gameId,
+        gameId: validationResult.data.gameId,
         requesterId: sessionId,
       });
 
@@ -223,22 +239,35 @@ export class GameApplicationService {
   }
 
   /**
-   * ゲーム開始（準備中→出題中）
-   * @param gameId ゲームID
+   * ゲーム開始（準備中→出題中）（バリデーション含む）
+   * @param input 未検証のゲームID
    * @returns 開始成功/失敗
    */
-  async startGame(gameId: string): Promise<ServiceVoidResponse> {
+  async startGame(input: unknown): Promise<ServiceVoidResponse> {
+    // 1. Zodバリデーション
+    const validationResult = StartGameActionSchema.safeParse(input);
+    if (!validationResult.success) {
+      return {
+        success: false,
+        errors: await translateZodError(validationResult.error),
+      };
+    }
+
     try {
-      // 1. セッション取得
+      // 2. セッション取得
       const sessionService = SessionServiceContainer.getSessionService();
       const sessionId = await sessionService.requireCurrentSession();
 
-      // 2. リポジトリ・UseCase準備
+      // 3. リポジトリ・UseCase準備
       const repository = createGameRepository();
 
-      // 3. ステータス遷移検証
+      // 4. ステータス遷移検証
       const validateUseCase = new ValidateStatusTransition(repository);
-      const validationResponse = await validateUseCase.execute(gameId, '出題中', sessionId);
+      const validationResponse = await validateUseCase.execute(
+        validationResult.data.gameId,
+        '出題中',
+        sessionId
+      );
 
       if (!validationResponse.canTransition) {
         return {
@@ -249,9 +278,9 @@ export class GameApplicationService {
         };
       }
 
-      // 4. ゲーム開始実行
+      // 5. ゲーム開始実行
       const startUseCase = new StartAcceptingResponses(repository);
-      await startUseCase.execute({ gameId });
+      await startUseCase.execute({ gameId: validationResult.data.gameId });
 
       return { success: true };
     } catch (error) {
@@ -260,22 +289,35 @@ export class GameApplicationService {
   }
 
   /**
-   * ゲーム終了（出題中→締切）
-   * @param gameId ゲームID
+   * ゲーム終了（出題中→締切）（バリデーション含む）
+   * @param input 未検証のゲームID
    * @returns 終了成功/失敗
    */
-  async closeGame(gameId: string): Promise<ServiceVoidResponse> {
+  async closeGame(input: unknown): Promise<ServiceVoidResponse> {
+    // 1. Zodバリデーション
+    const validationResult = CloseGameActionSchema.safeParse(input);
+    if (!validationResult.success) {
+      return {
+        success: false,
+        errors: await translateZodError(validationResult.error),
+      };
+    }
+
     try {
-      // 1. セッション取得
+      // 2. セッション取得
       const sessionService = SessionServiceContainer.getSessionService();
       const sessionId = await sessionService.requireCurrentSession();
 
-      // 2. リポジトリ・UseCase準備
+      // 3. リポジトリ・UseCase準備
       const repository = createGameRepository();
 
-      // 3. ステータス遷移検証
+      // 4. ステータス遷移検証
       const validateUseCase = new ValidateStatusTransition(repository);
-      const validationResponse = await validateUseCase.execute(gameId, '締切', sessionId);
+      const validationResponse = await validateUseCase.execute(
+        validationResult.data.gameId,
+        '締切',
+        sessionId
+      );
 
       if (!validationResponse.canTransition) {
         return {
@@ -286,9 +328,9 @@ export class GameApplicationService {
         };
       }
 
-      // 4. ゲーム終了実行
+      // 5. ゲーム終了実行
       const closeUseCase = new CloseGame(repository);
-      await closeUseCase.execute({ gameId, sessionId });
+      await closeUseCase.execute({ gameId: validationResult.data.gameId, sessionId });
 
       return { success: true };
     } catch (error) {
@@ -297,22 +339,31 @@ export class GameApplicationService {
   }
 
   /**
-   * 回答受付開始（旧startAcceptingAction用）
-   * @param gameId ゲームID
+   * 回答受付開始（旧startAcceptingAction用）（バリデーション含む）
+   * @param input 未検証のゲームID
    * @returns 開始成功/失敗
    */
-  async startAcceptingResponses(gameId: string): Promise<ServiceVoidResponse> {
+  async startAcceptingResponses(input: unknown): Promise<ServiceVoidResponse> {
+    // 1. Zodバリデーション
+    const validationResult = StartAcceptingSchema.safeParse(input);
+    if (!validationResult.success) {
+      return {
+        success: false,
+        errors: await translateZodError(validationResult.error),
+      };
+    }
+
     try {
-      // 1. セッション取得（認可用、現在は使用していないが将来のため）
+      // 2. セッション取得（認可用、現在は使用していないが将来のため）
       const sessionService = SessionServiceContainer.getSessionService();
       await sessionService.requireCurrentSession();
 
-      // 2. リポジトリ・UseCase準備
+      // 3. リポジトリ・UseCase準備
       const repository = createGameRepository();
       const useCase = new StartAcceptingResponses(repository);
 
-      // 3. UseCase実行
-      await useCase.execute({ gameId });
+      // 4. UseCase実行
+      await useCase.execute({ gameId: validationResult.data.gameId });
 
       return { success: true };
     } catch (error) {
