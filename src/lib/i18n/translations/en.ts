@@ -81,6 +81,8 @@ export const en: Translations = {
     gameClosed: 'Game Closed',
     createdGames: 'Created Games',
     availableGames: 'Available Games',
+    searchPlaceholder: 'Search games...',
+    searchLabel: 'Search games',
   },
 
   session: {
@@ -186,6 +188,7 @@ export const en: Translations = {
     noGames: 'No games',
     createFirstGame: "Let's create your first game",
     noAvailableGames: 'No available games',
+    noSearchResults: 'No games found matching "{query}"',
   },
 
   validation: {
