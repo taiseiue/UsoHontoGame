@@ -34,6 +34,7 @@ export const en: Translations = {
     language: 'Language',
     dashboard: 'Dashboard',
     activeGames: 'Active Games',
+    participantTop: 'Player Top',
   },
 
   game: {

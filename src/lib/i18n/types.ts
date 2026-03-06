@@ -52,6 +52,7 @@ export interface NavigationTranslations {
   language: string;
   dashboard: string;
   activeGames: string;
+  participantTop: string;
 }
 
 /**
