@@ -162,4 +162,27 @@ export interface IGameRepository {
     }>;
     total: number;
   }>;
+
+  /**
+   * Search games by title with case-insensitive, space-delimited OR matching
+   * Each space-separated token is matched as a substring (OR logic)
+   * @param params Search query and pagination parameters
+   * @returns Matching games with pagination metadata
+   */
+  searchByTitle(params: {
+    query: string;
+    limit: number;
+    skip: number;
+  }): Promise<{
+    games: Array<{
+      id: string;
+      title: string;
+      createdAt: Date;
+      playerCount: number;
+      playerLimit: number | null;
+      creatorId: string;
+      status: string;
+    }>;
+    total: number;
+  }>;
 }
