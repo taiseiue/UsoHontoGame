@@ -81,6 +81,8 @@ export const ja: Translations = {
     gameClosed: 'ゲーム締切',
     createdGames: '作成したゲーム',
     availableGames: '参加可能なゲーム',
+    searchPlaceholder: 'ゲーム名を検索...',
+    searchLabel: 'ゲームを検索',
   },
 
   session: {
@@ -186,6 +188,7 @@ export const ja: Translations = {
     noGames: 'ゲームがありません',
     createFirstGame: '最初のゲームを作成しましょう',
     noAvailableGames: '参加可能なゲームがありません',
+    noSearchResults: '「{query}」に一致するゲームが見つかりませんでした',
   },
 
   validation: {

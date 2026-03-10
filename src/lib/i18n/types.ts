@@ -105,6 +105,8 @@ export interface GameTranslations {
   gameClosed: string;
   createdGames: string;
   availableGames: string;
+  searchPlaceholder: string;
+  searchLabel: string;
 }
 
 /**
@@ -227,6 +229,7 @@ export interface EmptyStateTranslations {
   noGames: string;
   createFirstGame: string;
   noAvailableGames: string;
+  noSearchResults: string;
 }
 
 /**

@@ -4,6 +4,7 @@
 
 'use client';
 
+import { useState } from 'react';
 import { ActiveGamesList } from '@/components/domain/game/ActiveGamesList';
 import { NicknameInput } from '@/components/domain/session/NicknameInput';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -43,7 +44,18 @@ export function TopPageNicknameSetup() {
  */
 export function TopPage({ nickname, games, currentSessionId }: TopPageProps) {
   const { t } = useLanguage();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredGames = searchQuery.trim()
+    ? games.filter((game) => {
+        const tokens = searchQuery.trim().split(/\s+/).filter(Boolean);
+        const title = (game.title ?? '').toLowerCase();
+        return tokens.some((token) => title.includes(token.toLowerCase()));
+      })
+    : games;
+
   const hasGames = games && games.length > 0;
+  const hasResults = filteredGames.length > 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -56,16 +68,31 @@ export function TopPage({ nickname, games, currentSessionId }: TopPageProps) {
             </h1>
           </div>
 
-          <div className="mb-6">
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-2xl font-semibold text-gray-800">{t('game.activeGames')}</h2>
+            {hasGames && (
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t('game.searchPlaceholder')}
+                aria-label={t('game.searchLabel')}
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:w-72"
+              />
+            )}
           </div>
 
-          {hasGames ? (
-            <ActiveGamesList games={games} currentSessionId={currentSessionId} />
-          ) : (
+          {!hasGames ? (
             <EmptyState
               message={t('emptyState.noActiveGames')}
               subMessage={t('emptyState.waitForGames')}
+            />
+          ) : hasResults ? (
+            <ActiveGamesList games={filteredGames} currentSessionId={currentSessionId} />
+          ) : (
+            <EmptyState
+              message={t('emptyState.noSearchResults').replace('{query}', searchQuery)}
+              subMessage=""
             />
           )}
         </div>
